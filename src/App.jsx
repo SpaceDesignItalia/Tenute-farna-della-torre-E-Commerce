@@ -5,6 +5,7 @@ import axios from "axios";
 import { API_URL } from "./API/API";
 import Home from "./Pages/Home/Home";
 import Navbar from "./Components/Layout/Navbar";
+import Footbar from "./Components/Layout/Footbar";
 
 export default function App() {
   const [isAuth, setIsAuth] = useState(true);
@@ -60,6 +61,7 @@ export default function App() {
           <Route exact path="/" element={<Home />} />
         </Route>
       </Routes>
+      <Footbar />
     </>
   );
 }
