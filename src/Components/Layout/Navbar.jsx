@@ -204,7 +204,7 @@ export default function Navbar() {
 
                       <div className="flow-root">
                         <a
-                          href="#"
+                          href="/cart"
                           className="group -m-2 flex items-center p-2"
                         >
                           <ShoppingCartIcon

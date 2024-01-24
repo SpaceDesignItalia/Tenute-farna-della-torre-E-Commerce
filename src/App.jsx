@@ -6,6 +6,7 @@ import { API_URL } from "./API/API";
 import Home from "./Pages/Home/Home";
 import Navbar from "./Components/Layout/Navbar";
 import Footbar from "./Components/Layout/Footbar";
+import ShoppingCart from "./Pages/Cart/ShoppingCart";
 
 export default function App() {
   const [isAuth, setIsAuth] = useState(true);
@@ -54,11 +55,10 @@ export default function App() {
     <>
       <Navbar />
       <Routes>
-        <Route element={<LoginRoute isAuth={isAuth} />}>
-          {/* <Route exact path="/login" element={<Login />} /> */}
-        </Route>
+        <Route element={<LoginRoute isAuth={isAuth} />}></Route>
         <Route element={<ProtectedRoute isAuth={isAuth} />}>
           <Route exact path="/" element={<Home />} />
+          <Route exact path="/cart" element={<ShoppingCart />} />
         </Route>
       </Routes>
       <Footbar />
