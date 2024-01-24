@@ -4,6 +4,7 @@ import { Spinner } from "@nextui-org/react";
 import axios from "axios";
 import { API_URL } from "./API/API";
 import Home from "./Pages/Home/Home";
+import Navbar from "./Components/Layout/Navbar";
 
 export default function App() {
   const [isAuth, setIsAuth] = useState(true);
@@ -50,6 +51,7 @@ export default function App() {
 
   return (
     <>
+      <Navbar />
       <Routes>
         <Route element={<LoginRoute isAuth={isAuth} />}>
           {/* <Route exact path="/login" element={<Login />} /> */}
