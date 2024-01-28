@@ -7,6 +7,7 @@ import Home from "./Pages/Home/Home";
 import Navbar from "./Components/Layout/Navbar";
 import Footbar from "./Components/Layout/Footbar";
 import ShoppingCart from "./Pages/Cart/ShoppingCart";
+import ProductPage from "./Pages/Store/ProductPage";
 
 export default function App() {
   const [isAuth, setIsAuth] = useState(true);
@@ -59,6 +60,7 @@ export default function App() {
         <Route element={<ProtectedRoute isAuth={isAuth} />}>
           <Route exact path="/" element={<Home />} />
           <Route exact path="/cart" element={<ShoppingCart />} />
+          <Route exact path="/store" element={<ProductPage />} />
         </Route>
       </Routes>
       <Footbar />

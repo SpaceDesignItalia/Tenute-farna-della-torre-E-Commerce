@@ -3,8 +3,8 @@ import React from "react";
 export default function Footbar() {
   const navigation = {
     solutions: [
-      { name: "Home", href: "#" },
-      { name: "Store", href: "#" },
+      { name: "Home", href: "/" },
+      { name: "Store", href: "/store" },
     ],
     support: [
       { name: "Assistenza", href: "#" },
