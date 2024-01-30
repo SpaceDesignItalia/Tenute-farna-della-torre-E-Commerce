@@ -1,0 +1,385 @@
+import { Fragment, useState } from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import { XMarkIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { RadioGroup, Radio } from "@nextui-org/react";
+import { Slider } from "@nextui-org/react";
+import { Input } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
+
+const breadcrumbs = [{ id: 1, name: "Men", href: "#" }];
+const products = [
+  {
+    id: 1,
+    name: "Lorem ipsum",
+    href: "#",
+    price: 256,
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    options: "Options",
+    imageSrc: "https://m.media-amazon.com/images/I/71d2aeO3uKL.jpg",
+    imageAlt: "Office content 1",
+  },
+  {
+    id: 2,
+    name: "Lorem ipsum",
+    href: "#",
+    price: 32,
+    description:
+      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    options: "Options",
+    imageSrc:
+      "https://s.tannico.it/media/catalog/product/cache/1/thumbnail/500x500/0dc2d03fe217f8c83829496872af24a0/d/p/dp13_2.jpg",
+    imageAlt: "Office content 2",
+  },
+];
+
+export default function ProductPage() {
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [priceRange, setPriceRange] = useState([0, 300]);
+  const [orderBy, setOrderBy] = useState("empty");
+  const [filteredProducts, setFilteredProducts] = useState(products);
+  const [value, setValue] = useState([0, 300]);
+
+  const handlePriceChange = (newRange, specificValue) => {
+    setPriceRange(newRange);
+    setValue(newRange);
+
+    // Verifica se l'elemento esiste prima di tentare di accedere a style
+    const sliderHandle = document.querySelector(".next-slider-handle");
+    if (sliderHandle) {
+      sliderHandle.style.left = `${(specificValue / 300) * 100}%`;
+    }
+  };
+
+  const handleOrderChange = (value) => {
+    setOrderBy(value);
+
+    // Aggiorna i prodotti filtrati solo se è stato selezionato un ordine valido
+    if (value !== "empty") {
+      updateFilteredProducts();
+    }
+  };
+
+  const handleSearch = () => {
+    updateFilteredProducts();
+  };
+
+  const updateFilteredProducts = () => {
+    const updatedProducts = products.filter((product) => {
+      const productPrice = parseInt(product.price, 10);
+      return productPrice >= value[0] && productPrice <= value[1];
+    });
+
+    const sortedProducts = [...updatedProducts].sort((a, b) => {
+      const priceA = parseInt(a.price, 10);
+      const priceB = parseInt(b.price, 10);
+
+      if (orderBy === "ASC") {
+        return priceA - priceB;
+      } else if (orderBy === "DESC") {
+        return priceB - priceA;
+      } else {
+        return 0; // No specific order
+      }
+    });
+
+    setFilteredProducts(sortedProducts);
+  };
+
+  return (
+    <div className="bg-white">
+      <div>
+        <Transition.Root show={mobileFiltersOpen} as={Fragment}>
+          <Dialog
+            as="div"
+            className="relative z-40 lg:hidden"
+            onClose={() => setMobileFiltersOpen(false)}
+          >
+            <Transition.Child
+              as={Fragment}
+              enter="transition-opacity ease-linear duration-300"
+              enterFrom="opacity-0"
+              enterTo="opacity-100"
+              leave="transition-opacity ease-linear duration-300"
+              leaveFrom="opacity-100"
+              leaveTo="opacity-0"
+            >
+              <div className="fixed inset-0 bg-black bg-opacity-25" />
+            </Transition.Child>
+
+            <div className="fixed inset-0 z-40 flex">
+              <Transition.Child
+                as={Fragment}
+                enter="transition ease-in-out duration-300 transform"
+                enterFrom="translate-x-full"
+                enterTo="translate-x-0"
+                leave="transition ease-in-out duration-300 transform"
+                leaveFrom="translate-x-0"
+                leaveTo="translate-x-full"
+              >
+                <Dialog.Panel className="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-6 shadow-xl">
+                  <div className="flex items-center justify-between px-4">
+                    <h2 className="text-lg font-medium text-gray-900">
+                      Filtri
+                    </h2>
+                    <button
+                      type="button"
+                      className="relative -mr-2 flex h-10 w-10 items-center justify-center p-2 text-gray-400 hover:text-gray-500"
+                      onClick={() => setMobileFiltersOpen(false)}
+                    >
+                      <span className="absolute -inset-0.5" />
+                      <span className="sr-only">Chiudi menu</span>
+                      <XMarkIcon className="h-6 w-6" aria-hidden="true" />
+                    </button>
+                  </div>
+
+                  <form className="mt-4 px-5">
+                    <RadioGroup
+                      defaultValue={orderBy}
+                      onChange={handleOrderChange}
+                    >
+                      <h2 className="text-lg font-semibold">Ordina per</h2>
+                      <Radio value="empty">Nulla</Radio>
+                      <Radio value="ASC">Prezzo crescente</Radio>
+                      <Radio value="DESC">Prezzo decrescente</Radio>
+                    </RadioGroup>
+                    <h2 className="text-lg font-semibold pt-5">Filtra per</h2>
+                    <h3 className="text-sm font-semibold pt-2">Prezzo</h3>
+                    <div className="flex flex-row gap-5">
+                      <Input
+                        variant="faded"
+                        type="number"
+                        value={value[0]}
+                        aria-label="Prezzo minimo"
+                        onChange={(e) => {
+                          setValue([e.target.value, value[1]]);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleSearch();
+                            handlePriceChange(
+                              [e.target.value, value[1]],
+                              e.target.value
+                            );
+                          }
+                        }}
+                        endContent={
+                          <div className="pointer-events-none flex items-center">
+                            <span className="text-default-400 text-small">
+                              €
+                            </span>
+                          </div>
+                        }
+                      />
+                      <Input
+                        variant="faded"
+                        type="number"
+                        value={value[1]}
+                        aria-label="Prezzo massimo"
+                        onChange={(e) => {
+                          setValue([value[0], e.target.value]);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleSearch();
+                            handlePriceChange(
+                              [value[0], e.target.value],
+                              e.target.value
+                            );
+                          }
+                        }}
+                        maxValue={200}
+                        endContent={
+                          <div className="pointer-events-none flex items-center">
+                            <span className="text-default-400 text-small">
+                              €
+                            </span>
+                          </div>
+                        }
+                      />
+                    </div>
+                    <Slider
+                      aria-label="Prezzo"
+                      step={5}
+                      minValue={0}
+                      maxValue={300}
+                      defaultValue={priceRange}
+                      className="max-w-md py-2"
+                      onChange={handlePriceChange}
+                    />
+                    <Button
+                      onClick={handleSearch}
+                      className="w-full bg-primary text-white"
+                    >
+                      Cerca
+                    </Button>
+                  </form>
+                </Dialog.Panel>
+              </Transition.Child>
+            </div>
+          </Dialog>
+        </Transition.Root>
+
+        <main className="mx-auto max-w-2xl px-4 lg:max-w-7xl lg:px-8">
+          <div className="border-b border-gray-200 pb-10 pt-24">
+            <h1 className="text-4xl font-bold tracking-tight text-gray-900">
+              Lorem ipsum
+            </h1>
+            <p className="mt-4 text-base text-gray-500">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
+              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            </p>
+          </div>
+
+          <div className="pb-24 pt-12 lg:grid lg:grid-cols-3 lg:gap-x-8 xl:grid-cols-4">
+            <aside>
+              <h2 className="sr-only">Filters</h2>
+
+              <button
+                type="button"
+                className="inline-flex items-center lg:hidden"
+                onClick={() => setMobileFiltersOpen(true)}
+              >
+                <span className="text-sm font-medium text-gray-700">
+                  Filters
+                </span>
+                <PlusIcon
+                  className="ml-1 h-5 w-5 flex-shrink-0 text-gray-400"
+                  aria-hidden="true"
+                />
+              </button>
+
+              <div className="hidden lg:block">
+                <form className="space-y-3 divide-gray-200">
+                  <RadioGroup
+                    defaultValue={orderBy}
+                    onChange={handleOrderChange}
+                  >
+                    <h2 className="text-lg font-semibold">Ordina per</h2>
+                    <Radio value="empty">Nulla</Radio>
+                    <Radio value="ASC">Prezzo crescente</Radio>
+                    <Radio value="DESC">Prezzo decrescente</Radio>
+                  </RadioGroup>
+                  <h2 className="text-lg font-semibold pt-3">Filtra per</h2>
+                  <h3 className="text-sm font-semibold">Prezzo</h3>
+                  <div className="flex flex-row gap-5">
+                    <Input
+                      variant="faded"
+                      type="number"
+                      value={value[0]}
+                      aria-label="Prezzo minimo"
+                      onChange={(e) => {
+                        setValue([e.target.value, value[1]]);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleSearch();
+                          handlePriceChange(
+                            [e.target.value, value[1]],
+                            e.target.value
+                          );
+                        }
+                      }}
+                      endContent={
+                        <div className="pointer-events-none flex items-center">
+                          <span className="text-default-400 text-small">€</span>
+                        </div>
+                      }
+                    />
+                    <Input
+                      variant="faded"
+                      type="number"
+                      value={value[1]}
+                      aria-label="Prezzo massimo"
+                      onChange={(e) => {
+                        setValue([value[0], e.target.value]);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleSearch();
+                          handlePriceChange(
+                            [value[0], e.target.value],
+                            e.target.value
+                          );
+                        }
+                      }}
+                      maxValue={200}
+                      endContent={
+                        <div className="pointer-events-none flex items-center">
+                          <span className="text-default-400 text-small">€</span>
+                        </div>
+                      }
+                    />
+                  </div>
+                  <Slider
+                    aria-label="Prezzo"
+                    step={5}
+                    minValue={0}
+                    maxValue={300}
+                    defaultValue={priceRange}
+                    className="max-w-md"
+                    onChange={handlePriceChange}
+                  />
+                  <Button
+                    onClick={handleSearch}
+                    className="w-full bg-primary text-white"
+                  >
+                    Cerca
+                  </Button>
+                </form>
+              </div>
+            </aside>
+
+            <section
+              aria-labelledby="product-heading"
+              className="mt-6 lg:col-span-2 lg:mt-0 xl:col-span-3"
+            >
+              <h2 id="product-heading" className="sr-only">
+                Products
+              </h2>
+
+              <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:gap-x-8 xl:grid-cols-3">
+                {filteredProducts.map((product) => (
+                  <div
+                    key={product.id}
+                    className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
+                  >
+                    <div className="aspect-h-4 aspect-w-3 bg-gray-200 sm:aspect-none group-hover:opacity-75 sm:h-96">
+                      <img
+                        src={product.imageSrc}
+                        alt={product.imageAlt}
+                        className="h-full w-full object-cover object-center sm:h-full sm:w-full"
+                      />
+                    </div>
+                    <div className="flex flex-1 flex-col space-y-2 p-4">
+                      <h3 className="text-sm font-medium text-gray-900">
+                        <a href={product.href}>
+                          <span
+                            aria-hidden="true"
+                            className="absolute inset-0"
+                          />
+                          {product.name}
+                        </a>
+                      </h3>
+                      <p className="text-sm text-gray-500">
+                        {product.description}
+                      </p>
+                      <div className="flex flex-1 flex-col justify-end">
+                        <p className="text-sm italic text-gray-500">
+                          {product.options}
+                        </p>
+                        <p className="text-base font-medium text-gray-900">
+                          €{product.price}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
