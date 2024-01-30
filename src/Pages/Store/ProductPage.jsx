@@ -1,11 +1,10 @@
 import { Fragment, useState } from "react";
-import { Dialog, Disclosure, Transition } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/24/outline";
-import { ChevronDownIcon, PlusIcon } from "@heroicons/react/20/solid";
-import { Checkbox } from "@nextui-org/react";
-import { Slider } from "@nextui-org/react";
-import { Button } from "@nextui-org/react";
+import { Dialog, Transition } from "@headlessui/react";
+import { XMarkIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { RadioGroup, Radio } from "@nextui-org/react";
+import { Slider } from "@nextui-org/react";
+import { Input } from "@nextui-org/react";
+import { Button } from "@nextui-org/react";
 
 const breadcrumbs = [{ id: 1, name: "Men", href: "#" }];
 const products = [
@@ -13,44 +12,88 @@ const products = [
     id: 1,
     name: "Lorem ipsum",
     href: "#",
-    price: "€256",
+    price: 256,
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     options: "Options",
-    imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/category-page-02-image-card-01.jpg",
+    imageSrc: "https://m.media-amazon.com/images/I/71d2aeO3uKL.jpg",
     imageAlt: "Office content 1",
   },
   {
     id: 2,
     name: "Lorem ipsum",
     href: "#",
-    price: "€32",
+    price: 32,
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     options: "Options",
     imageSrc:
-      "https://tailwindui.com/img/ecommerce-images/category-page-02-image-card-02.jpg",
+      "https://s.tannico.it/media/catalog/product/cache/1/thumbnail/500x500/0dc2d03fe217f8c83829496872af24a0/d/p/dp13_2.jpg",
     imageAlt: "Office content 2",
   },
 ];
-function classNames(...classes) {
-  return classes.filter(Boolean).join(" ");
-}
 
 export default function ProductPage() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [priceRange, setPriceRange] = useState([0, 300]);
+  const [orderBy, setOrderBy] = useState("empty");
+  const [filteredProducts, setFilteredProducts] = useState(products);
+  const [value, setValue] = useState([0, 300]);
+
+  const handlePriceChange = (newRange, specificValue) => {
+    setPriceRange(newRange);
+    setValue(newRange);
+
+    // Verifica se l'elemento esiste prima di tentare di accedere a style
+    const sliderHandle = document.querySelector(".next-slider-handle");
+    if (sliderHandle) {
+      sliderHandle.style.left = `${(specificValue / 300) * 100}%`;
+    }
+  };
+
+  const handleOrderChange = (value) => {
+    setOrderBy(value);
+
+    // Aggiorna i prodotti filtrati solo se è stato selezionato un ordine valido
+    if (value !== "empty") {
+      updateFilteredProducts();
+    }
+  };
+
+  const handleSearch = () => {
+    updateFilteredProducts();
+  };
+
+  const updateFilteredProducts = () => {
+    const updatedProducts = products.filter((product) => {
+      const productPrice = parseInt(product.price, 10);
+      return productPrice >= value[0] && productPrice <= value[1];
+    });
+
+    const sortedProducts = [...updatedProducts].sort((a, b) => {
+      const priceA = parseInt(a.price, 10);
+      const priceB = parseInt(b.price, 10);
+
+      if (orderBy === "ASC") {
+        return priceA - priceB;
+      } else if (orderBy === "DESC") {
+        return priceB - priceA;
+      } else {
+        return 0; // No specific order
+      }
+    });
+
+    setFilteredProducts(sortedProducts);
+  };
 
   return (
     <div className="bg-white">
       <div>
-        {/* Mobile filter dialog */}
         <Transition.Root show={mobileFiltersOpen} as={Fragment}>
           <Dialog
             as="div"
             className="relative z-40 lg:hidden"
-            onClose={setMobileFiltersOpen}
+            onClose={() => setMobileFiltersOpen(false)}
           >
             <Transition.Child
               as={Fragment}
@@ -77,7 +120,7 @@ export default function ProductPage() {
                 <Dialog.Panel className="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-6 shadow-xl">
                   <div className="flex items-center justify-between px-4">
                     <h2 className="text-lg font-medium text-gray-900">
-                      Filters
+                      Filtri
                     </h2>
                     <button
                       type="button"
@@ -85,29 +128,91 @@ export default function ProductPage() {
                       onClick={() => setMobileFiltersOpen(false)}
                     >
                       <span className="absolute -inset-0.5" />
-                      <span className="sr-only">Close menu</span>
+                      <span className="sr-only">Chiudi menu</span>
                       <XMarkIcon className="h-6 w-6" aria-hidden="true" />
                     </button>
                   </div>
 
-                  {/* Filters */}
                   <form className="mt-4 px-5">
-                    <h2 className="text-lg font-semibold">Filtra per</h2>
-
-                    <RadioGroup defaultValue="empty">
+                    <RadioGroup
+                      defaultValue={orderBy}
+                      onChange={handleOrderChange}
+                    >
+                      <h2 className="text-lg font-semibold">Ordina per</h2>
                       <Radio value="empty">Nulla</Radio>
                       <Radio value="ASC">Prezzo crescente</Radio>
                       <Radio value="DESC">Prezzo decrescente</Radio>
                     </RadioGroup>
+                    <h2 className="text-lg font-semibold pt-5">Filtra per</h2>
+                    <h3 className="text-sm font-semibold pt-2">Prezzo</h3>
+                    <div className="flex flex-row gap-5">
+                      <Input
+                        variant="faded"
+                        type="number"
+                        value={value[0]}
+                        aria-label="Prezzo minimo"
+                        onChange={(e) => {
+                          setValue([e.target.value, value[1]]);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleSearch();
+                            handlePriceChange(
+                              [e.target.value, value[1]],
+                              e.target.value
+                            );
+                          }
+                        }}
+                        endContent={
+                          <div className="pointer-events-none flex items-center">
+                            <span className="text-default-400 text-small">
+                              €
+                            </span>
+                          </div>
+                        }
+                      />
+                      <Input
+                        variant="faded"
+                        type="number"
+                        value={value[1]}
+                        aria-label="Prezzo massimo"
+                        onChange={(e) => {
+                          setValue([value[0], e.target.value]);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            handleSearch();
+                            handlePriceChange(
+                              [value[0], e.target.value],
+                              e.target.value
+                            );
+                          }
+                        }}
+                        maxValue={200}
+                        endContent={
+                          <div className="pointer-events-none flex items-center">
+                            <span className="text-default-400 text-small">
+                              €
+                            </span>
+                          </div>
+                        }
+                      />
+                    </div>
                     <Slider
-                      label="Prezzo"
+                      aria-label="Prezzo"
                       step={5}
                       minValue={0}
                       maxValue={300}
-                      defaultValue={[0, 300]}
-                      formatOptions={{ style: "currency", currency: "EUR" }}
-                      className="max-w-md"
+                      defaultValue={priceRange}
+                      className="max-w-md py-2"
+                      onChange={handlePriceChange}
                     />
+                    <Button
+                      onClick={handleSearch}
+                      className="w-full bg-primary text-white"
+                    >
+                      Cerca
+                    </Button>
                   </form>
                 </Dialog.Panel>
               </Transition.Child>
@@ -145,21 +250,82 @@ export default function ProductPage() {
               </button>
 
               <div className="hidden lg:block">
-                <form className="space-y-10 divide-y divide-gray-200">
-                  <RadioGroup defaultValue="empty">
+                <form className="space-y-3 divide-gray-200">
+                  <RadioGroup
+                    defaultValue={orderBy}
+                    onChange={handleOrderChange}
+                  >
+                    <h2 className="text-lg font-semibold">Ordina per</h2>
                     <Radio value="empty">Nulla</Radio>
                     <Radio value="ASC">Prezzo crescente</Radio>
                     <Radio value="DESC">Prezzo decrescente</Radio>
                   </RadioGroup>
+                  <h2 className="text-lg font-semibold pt-3">Filtra per</h2>
+                  <h3 className="text-sm font-semibold">Prezzo</h3>
+                  <div className="flex flex-row gap-5">
+                    <Input
+                      variant="faded"
+                      type="number"
+                      value={value[0]}
+                      aria-label="Prezzo minimo"
+                      onChange={(e) => {
+                        setValue([e.target.value, value[1]]);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleSearch();
+                          handlePriceChange(
+                            [e.target.value, value[1]],
+                            e.target.value
+                          );
+                        }
+                      }}
+                      endContent={
+                        <div className="pointer-events-none flex items-center">
+                          <span className="text-default-400 text-small">€</span>
+                        </div>
+                      }
+                    />
+                    <Input
+                      variant="faded"
+                      type="number"
+                      value={value[1]}
+                      aria-label="Prezzo massimo"
+                      onChange={(e) => {
+                        setValue([value[0], e.target.value]);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          handleSearch();
+                          handlePriceChange(
+                            [value[0], e.target.value],
+                            e.target.value
+                          );
+                        }
+                      }}
+                      maxValue={200}
+                      endContent={
+                        <div className="pointer-events-none flex items-center">
+                          <span className="text-default-400 text-small">€</span>
+                        </div>
+                      }
+                    />
+                  </div>
                   <Slider
-                    label="Prezzo"
+                    aria-label="Prezzo"
                     step={5}
                     minValue={0}
                     maxValue={300}
-                    defaultValue={[0, 300]}
-                    formatOptions={{ style: "currency", currency: "EUR" }}
+                    defaultValue={priceRange}
                     className="max-w-md"
+                    onChange={handlePriceChange}
                   />
+                  <Button
+                    onClick={handleSearch}
+                    className="w-full bg-primary text-white"
+                  >
+                    Cerca
+                  </Button>
                 </form>
               </div>
             </aside>
@@ -173,7 +339,7 @@ export default function ProductPage() {
               </h2>
 
               <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:gap-x-8 xl:grid-cols-3">
-                {products.map((product) => (
+                {filteredProducts.map((product) => (
                   <div
                     key={product.id}
                     className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
@@ -203,7 +369,7 @@ export default function ProductPage() {
                           {product.options}
                         </p>
                         <p className="text-base font-medium text-gray-900">
-                          {product.price}
+                          €{product.price}
                         </p>
                       </div>
                     </div>
