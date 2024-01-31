@@ -8,6 +8,7 @@ import Navbar from "./Components/Layout/Navbar";
 import Footbar from "./Components/Layout/Footbar";
 import ShoppingCart from "./Pages/Cart/ShoppingCart";
 import ProductPage from "./Pages/Store/ProductPage";
+import About from "./Pages/About/About";
 
 export default function App() {
   const [isAuth, setIsAuth] = useState(true);
@@ -61,6 +62,7 @@ export default function App() {
           <Route exact path="/" element={<Home />} />
           <Route exact path="/cart" element={<ShoppingCart />} />
           <Route exact path="/store" element={<ProductPage />} />
+          <Route exact path="/about" element={<About />} />
         </Route>
       </Routes>
       <Footbar />
