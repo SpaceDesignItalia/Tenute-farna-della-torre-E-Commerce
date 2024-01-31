@@ -1,12 +1,12 @@
-import { Fragment, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { XMarkIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { RadioGroup, Radio } from "@nextui-org/react";
 import { Slider } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
+import { Spinner } from "@nextui-org/react";
 
-const breadcrumbs = [{ id: 1, name: "Men", href: "#" }];
 const products = [
   {
     id: 1,
@@ -35,55 +35,89 @@ const products = [
 
 export default function ProductPage() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
-  const [priceRange, setPriceRange] = useState([0, 300]);
+  const [tempValue, setTempValue] = useState([0, 300]);
+  const [tempOrderBy, setTempOrderBy] = useState("empty");
+  const [isLoading, setIsLoading] = useState(false);
+
+  const [value, setValue] = useState([0, 300]);
   const [orderBy, setOrderBy] = useState("empty");
   const [filteredProducts, setFilteredProducts] = useState(products);
-  const [value, setValue] = useState([0, 300]);
-
-  const handlePriceChange = (newRange, specificValue) => {
-    setPriceRange(newRange);
-    setValue(newRange);
-
-    // Verifica se l'elemento esiste prima di tentare di accedere a style
-    const sliderHandle = document.querySelector(".next-slider-handle");
-    if (sliderHandle) {
-      sliderHandle.style.left = `${(specificValue / 300) * 100}%`;
-    }
-  };
-
-  const handleOrderChange = (value) => {
-    setOrderBy(value);
-
-    // Aggiorna i prodotti filtrati solo se è stato selezionato un ordine valido
-    if (value !== "empty") {
-      updateFilteredProducts();
-    }
-  };
-
-  const handleSearch = () => {
-    updateFilteredProducts();
-  };
 
   const updateFilteredProducts = () => {
-    const updatedProducts = products.filter((product) => {
-      const productPrice = parseInt(product.price, 10);
-      return productPrice >= value[0] && productPrice <= value[1];
-    });
+    const filtered = products.filter((product) => {
+      const priceInRange =
+        product.price >= tempValue[0] && product.price <= tempValue[1];
 
-    const sortedProducts = [...updatedProducts].sort((a, b) => {
-      const priceA = parseInt(a.price, 10);
-      const priceB = parseInt(b.price, 10);
-
-      if (orderBy === "ASC") {
-        return priceA - priceB;
-      } else if (orderBy === "DESC") {
-        return priceB - priceA;
+      if (tempOrderBy === "ASC") {
+        return priceInRange;
+      } else if (tempOrderBy === "DESC") {
+        return priceInRange;
       } else {
-        return 0; // No specific order
+        // Se l'ordinamento non è specificato, restituisci tutti i prodotti nel range di prezzo
+        return priceInRange;
       }
     });
 
-    setFilteredProducts(sortedProducts);
+    setFilteredProducts(filtered);
+  };
+
+  const applyFilters = async () => {
+    setIsLoading(true);
+
+    await new Promise((resolve) => {
+      setTimeout(async () => {
+        setValue(tempValue);
+        setOrderBy(tempOrderBy);
+        setMobileFiltersOpen(false);
+
+        // Chiamata API effettiva
+        try {
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+          updateFilteredProducts();
+        } catch (error) {
+          console.error("Errore durante il caricamento dei dati:", error);
+        } finally {
+          setIsLoading(false);
+          resolve(); // Risolvi la promessa dopo aver completato il caricamento
+        }
+      }, 0);
+    });
+  };
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchData = async () => {
+      try {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        if (isMounted) {
+          updateFilteredProducts();
+          setIsLoading(false);
+        }
+      } catch (error) {
+        console.error("Errore durante il caricamento dei dati:", error);
+        if (isMounted) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    if (tempValue !== value || tempOrderBy !== orderBy) {
+      fetchData(); // Chiamata API solo se i filtri sono diversi
+    }
+
+    return () => {
+      isMounted = false;
+    };
+  }, [tempValue, tempOrderBy, value, orderBy]);
+
+  const handleTempPriceChange = (newRange) => {
+    setTempValue(newRange);
+  };
+
+  const handleTempOrderChange = (value) => {
+    setTempOrderBy(value);
   };
 
   return (
@@ -117,7 +151,7 @@ export default function ProductPage() {
                 leaveFrom="translate-x-0"
                 leaveTo="translate-x-full"
               >
-                <Dialog.Panel className="relative ml-auto flex h-full w-full max-w-xs flex-col overflow-y-auto bg-white py-4 pb-6 shadow-xl">
+                <Dialog.Panel className="relative ml-auto flex h-full w-full max-w-sm flex-col overflow-y-auto bg-white py-4 pb-6 shadow-xl">
                   <div className="flex items-center justify-between px-4">
                     <h2 className="text-lg font-medium text-gray-900">
                       Filtri
@@ -135,8 +169,8 @@ export default function ProductPage() {
 
                   <form className="mt-4 px-5">
                     <RadioGroup
-                      defaultValue={orderBy}
-                      onChange={handleOrderChange}
+                      defaultValue={tempOrderBy}
+                      onChange={handleTempOrderChange}
                     >
                       <h2 className="text-lg font-semibold">Ordina per</h2>
                       <Radio value="empty">Nulla</Radio>
@@ -149,19 +183,10 @@ export default function ProductPage() {
                       <Input
                         variant="faded"
                         type="number"
-                        value={value[0]}
+                        value={tempValue[0]}
                         aria-label="Prezzo minimo"
                         onChange={(e) => {
-                          setValue([e.target.value, value[1]]);
-                        }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleSearch();
-                            handlePriceChange(
-                              [e.target.value, value[1]],
-                              e.target.value
-                            );
-                          }
+                          setTempValue([e.target.value, tempValue[1]]);
                         }}
                         endContent={
                           <div className="pointer-events-none flex items-center">
@@ -174,21 +199,12 @@ export default function ProductPage() {
                       <Input
                         variant="faded"
                         type="number"
-                        value={value[1]}
+                        value={tempValue[1]}
                         aria-label="Prezzo massimo"
                         onChange={(e) => {
-                          setValue([value[0], e.target.value]);
+                          setTempValue([tempValue[0], e.target.value]);
                         }}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            handleSearch();
-                            handlePriceChange(
-                              [value[0], e.target.value],
-                              e.target.value
-                            );
-                          }
-                        }}
-                        maxValue={200}
+                        maxValue={300}
                         endContent={
                           <div className="pointer-events-none flex items-center">
                             <span className="text-default-400 text-small">
@@ -202,16 +218,18 @@ export default function ProductPage() {
                       showTooltip={true}
                       formatOptions={{ style: "currency", currency: "EUR" }}
                       step={10}
-                      maxValue={200}
+                      maxValue={300}
                       minValue={0}
-                      value={value}
-                      onChange={setValue}
+                      value={tempValue}
+                      onChange={handleTempPriceChange}
+                      className="mt-2"
+                      aria-label="Prezzo"
                     />
                     <Button
-                      onClick={handleSearch}
-                      className="w-full bg-primary text-white"
+                      onClick={applyFilters}
+                      className="w-full bg-primary text-white mt-3"
                     >
-                      Cerca
+                      Applica
                     </Button>
                   </form>
                 </Dialog.Panel>
@@ -233,7 +251,7 @@ export default function ProductPage() {
 
           <div className="pb-24 pt-12 lg:grid lg:grid-cols-3 lg:gap-x-8 xl:grid-cols-4">
             <aside>
-              <h2 className="sr-only">Filters</h2>
+              <h2 className="sr-only">Filtri</h2>
 
               <button
                 type="button"
@@ -241,7 +259,7 @@ export default function ProductPage() {
                 onClick={() => setMobileFiltersOpen(true)}
               >
                 <span className="text-sm font-medium text-gray-700">
-                  Filters
+                  Filtri
                 </span>
                 <PlusIcon
                   className="ml-1 h-5 w-5 flex-shrink-0 text-gray-400"
@@ -253,7 +271,7 @@ export default function ProductPage() {
                 <form className="space-y-3 divide-gray-200">
                   <RadioGroup
                     defaultValue={orderBy}
-                    onChange={handleOrderChange}
+                    onChange={handleTempOrderChange}
                   >
                     <h2 className="text-lg font-semibold">Ordina per</h2>
                     <Radio value="empty">Nulla</Radio>
@@ -266,19 +284,10 @@ export default function ProductPage() {
                     <Input
                       variant="faded"
                       type="number"
-                      value={value[0]}
+                      value={tempValue[0]}
                       aria-label="Prezzo minimo"
                       onChange={(e) => {
-                        setValue([e.target.value, value[1]]);
-                      }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          handleSearch();
-                          handlePriceChange(
-                            [e.target.value, value[1]],
-                            e.target.value
-                          );
-                        }
+                        setTempValue([e.target.value, tempValue[1]]);
                       }}
                       endContent={
                         <div className="pointer-events-none flex items-center">
@@ -289,21 +298,12 @@ export default function ProductPage() {
                     <Input
                       variant="faded"
                       type="number"
-                      value={value[1]}
+                      value={tempValue[1]}
                       aria-label="Prezzo massimo"
                       onChange={(e) => {
-                        setValue([value[0], e.target.value]);
+                        setTempValue([tempValue[0], e.target.value]);
                       }}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                          handleSearch();
-                          handlePriceChange(
-                            [value[0], e.target.value],
-                            e.target.value
-                          );
-                        }
-                      }}
-                      maxValue={200}
+                      maxValue={300}
                       endContent={
                         <div className="pointer-events-none flex items-center">
                           <span className="text-default-400 text-small">€</span>
@@ -315,16 +315,17 @@ export default function ProductPage() {
                     showTooltip={true}
                     formatOptions={{ style: "currency", currency: "EUR" }}
                     step={10}
-                    maxValue={200}
+                    maxValue={300}
                     minValue={0}
-                    value={value}
-                    onChange={setValue}
+                    value={tempValue}
+                    onChange={handleTempPriceChange}
+                    aria-label="Prezzo"
                   />
                   <Button
-                    onClick={handleSearch}
+                    onClick={applyFilters}
                     className="w-full bg-primary text-white"
                   >
-                    Cerca
+                    Applica
                   </Button>
                 </form>
               </div>
@@ -338,44 +339,56 @@ export default function ProductPage() {
                 Products
               </h2>
 
-              <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:gap-x-8 xl:grid-cols-3">
-                {filteredProducts.map((product) => (
-                  <div
-                    key={product.id}
-                    className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
-                  >
-                    <div className="aspect-h-4 aspect-w-3 bg-gray-200 sm:aspect-none group-hover:opacity-75 sm:h-96">
-                      <img
-                        src={product.imageSrc}
-                        alt={product.imageAlt}
-                        className="h-full w-full object-cover object-center sm:h-full sm:w-full"
-                      />
-                    </div>
-                    <div className="flex flex-1 flex-col space-y-2 p-4">
-                      <h3 className="text-sm font-medium text-gray-900">
-                        <a href={product.href}>
-                          <span
-                            aria-hidden="true"
-                            className="absolute inset-0"
-                          />
-                          {product.name}
-                        </a>
-                      </h3>
-                      <p className="text-sm text-gray-500">
-                        {product.description}
-                      </p>
-                      <div className="flex flex-1 flex-col justify-end">
-                        <p className="text-sm italic text-gray-500">
-                          {product.options}
+              {isLoading ? (
+                <div className="flex items-center justify-center h-96">
+                  <Spinner label="Caricamento..." color="primary" />
+                </div>
+              ) : filteredProducts.length === 0 ? (
+                <div className="flex items-center justify-center h-96">
+                  <p className="text-2xl text-gray-500">
+                    Nessun prodotto disponibile
+                  </p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:gap-x-8 xl:grid-cols-3">
+                  {filteredProducts.map((product) => (
+                    <div
+                      key={product.id}
+                      className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
+                    >
+                      <div className="aspect-h-4 aspect-w-3 bg-gray-200 sm:aspect-none group-hover:opacity-75 sm:h-96">
+                        <img
+                          src={product.imageSrc}
+                          alt={product.imageAlt}
+                          className="h-full w-full object-cover object-center sm:h-full sm:w-full"
+                        />
+                      </div>
+                      <div className="flex flex-1 flex-col space-y-2 p-4">
+                        <h3 className="text-sm font-medium text-gray-900">
+                          <a href={product.href}>
+                            <span
+                              aria-hidden="true"
+                              className="absolute inset-0"
+                            />
+                            {product.name}
+                          </a>
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          {product.description}
                         </p>
-                        <p className="text-base font-medium text-gray-900">
-                          €{product.price}
-                        </p>
+                        <div className="flex flex-1 flex-col justify-end">
+                          <p className="text-sm italic text-gray-500">
+                            {product.options}
+                          </p>
+                          <p className="text-base font-medium text-gray-900">
+                            €{product.price}
+                          </p>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
+                  ))}
+                </div>
+              )}
             </section>
           </div>
         </main>
