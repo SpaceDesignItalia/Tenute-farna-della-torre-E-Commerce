@@ -21,7 +21,7 @@ export default function Navbar() {
     pages: [
       { name: "Home", href: "/" },
       { name: "Store", href: "/store" },
-      { name: "Azienda", href: "/company" },
+      { name: "Azienda", href: "/about" },
     ],
   };
   return (
