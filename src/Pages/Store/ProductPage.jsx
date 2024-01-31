@@ -199,13 +199,13 @@ export default function ProductPage() {
                       />
                     </div>
                     <Slider
-                      aria-label="Prezzo"
-                      step={5}
+                      showTooltip={true}
+                      formatOptions={{ style: "currency", currency: "EUR" }}
+                      step={10}
+                      maxValue={200}
                       minValue={0}
-                      maxValue={300}
-                      defaultValue={priceRange}
-                      className="max-w-md py-2"
-                      onChange={handlePriceChange}
+                      value={value}
+                      onChange={setValue}
                     />
                     <Button
                       onClick={handleSearch}
@@ -312,13 +312,13 @@ export default function ProductPage() {
                     />
                   </div>
                   <Slider
-                    aria-label="Prezzo"
-                    step={5}
+                    showTooltip={true}
+                    formatOptions={{ style: "currency", currency: "EUR" }}
+                    step={10}
+                    maxValue={200}
                     minValue={0}
-                    maxValue={300}
-                    defaultValue={priceRange}
-                    className="max-w-md"
-                    onChange={handlePriceChange}
+                    value={value}
+                    onChange={setValue}
                   />
                   <Button
                     onClick={handleSearch}
