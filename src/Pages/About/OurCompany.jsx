@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import Uva1 from "../../assets/Uva1.jpg";
+import Vigna2 from "../../assets/Vigna2.jpg";
 
 export default class OurCompany extends Component {
   render() {
@@ -10,7 +10,7 @@ export default class OurCompany extends Component {
             <div class="flex flex-wrap md:my-10 ">
               <div class="w-full px-4 mb-10 lg:w-1/2 lg:mb-0">
                 <img
-                  src={Uva1}
+                  src={Vigna2}
                   alt="Office content 1"
                   class="relative z-40 object-cover w-full h-96 rounded-3xl"
                 />

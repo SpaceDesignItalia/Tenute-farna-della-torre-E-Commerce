@@ -1,4 +1,5 @@
 import React from "react";
+import Vigna1 from "../../assets/Vigna1.jpg";
 
 export default function HomeHero() {
   return (
@@ -6,8 +7,8 @@ export default function HomeHero() {
       {/* Decorative image and overlay */}
       <div aria-hidden="true" className="absolute inset-0 overflow-hidden">
         <img
-          src="https://tailwindui.com/img/ecommerce-images/home-page-01-hero-full-width.jpg"
-          alt=""
+          src={Vigna1}
+          alt="Office content 1"
           className="h-full w-full object-cover object-center"
         />
       </div>
@@ -26,7 +27,7 @@ export default function HomeHero() {
           sed rerum et corporis.
         </p>
         <a
-          href="#"
+          href="/store"
           className="mt-8 inline-block rounded-md border border-transparent bg-white px-8 py-3 text-base font-medium text-gray-900 hover:bg-gray-100"
         >
           Shop New Arrivals

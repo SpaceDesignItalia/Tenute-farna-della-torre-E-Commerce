@@ -23,6 +23,7 @@ export default function HomeCTA() {
             size="lg"
             radius="sm"
             className="mt-10 w-full lg:w-1/3 py-6"
+            href="/about"
           >
             Scopri la nostra azienda
           </Button>

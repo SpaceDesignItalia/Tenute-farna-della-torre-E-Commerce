@@ -9,9 +9,11 @@ import Footbar from "./Components/Layout/Footbar";
 import ShoppingCart from "./Pages/Cart/ShoppingCart";
 import ProductPage from "./Pages/Store/ProductPage";
 import About from "./Pages/About/About";
+import Login from "./Pages/Login/Login";
+import Dashboard from "./Pages/Dashboard/UserDashboard";
 
 export default function App() {
-  const [isAuth, setIsAuth] = useState(true);
+  const [isAuth, setIsAuth] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   /* useEffect(() => {
@@ -57,12 +59,17 @@ export default function App() {
     <>
       <Navbar />
       <Routes>
-        <Route element={<LoginRoute isAuth={isAuth} />}></Route>
+        <Route element={<LoginRoute isAuth={isAuth} />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/store" element={<ProductPage />} />
+          <Route path="/about" element={<About />} />
+        </Route>
         <Route element={<ProtectedRoute isAuth={isAuth} />}>
-          <Route exact path="/" element={<Home />} />
-          <Route exact path="/cart" element={<ShoppingCart />} />
-          <Route exact path="/store" element={<ProductPage />} />
-          <Route exact path="/about" element={<About />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/cart" element={<ShoppingCart />} />
+          <Route path="/store" element={<ProductPage />} />
+          <Route path="/about" element={<About />} />
         </Route>
       </Routes>
       <Footbar />

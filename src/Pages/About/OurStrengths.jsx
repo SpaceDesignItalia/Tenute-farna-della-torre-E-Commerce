@@ -1,5 +1,5 @@
 import React from "react";
-import Vigna1 from "../../assets/Vigna1.jpg";
+import Uva3 from "../../assets/Uva3.jpg";
 
 export default function OurStrengths() {
   return (
@@ -30,7 +30,7 @@ export default function OurStrengths() {
             </div>
             <div class="items-center w-full px-4 mb-10 lg:mb-0">
               <img
-                src={Vigna1}
+                src={Uva3}
                 alt="Office content 1"
                 class="relative z-40 object-cover w-full h-96 rounded-3xl"
               />

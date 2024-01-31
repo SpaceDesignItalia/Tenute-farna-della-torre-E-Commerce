@@ -102,7 +102,7 @@ export default function Navbar() {
                       </div>
                       <div className="flow-root">
                         <a
-                          href="#"
+                          href="/login"
                           className="-m-2 block p-2 font-medium text-gray-900"
                         >
                           Login
@@ -131,7 +131,7 @@ export default function Navbar() {
               <div className="flex h-16 items-center justify-between">
                 {/* Logo (lg+) */}
                 <div className="hidden lg:flex lg:items-center">
-                  <a href="#">
+                  <a href="/">
                     <span className="sr-only">Your Company</span>
                     <img
                       className="h-8 w-auto"
@@ -188,7 +188,7 @@ export default function Navbar() {
 
                         <div className="flex">
                           <a
-                            href="#"
+                            href="/dashboard"
                             className="-m-2 p-2 text-gray-400 hover:text-gray-500"
                           >
                             <span className="sr-only">Account</span>
@@ -224,7 +224,7 @@ export default function Navbar() {
                     <div className="flex items-center lg:ml-8">
                       <div className="hidden lg:flex lg:flex-1 lg:items-center lg:justify-end lg:space-x-6">
                         <a
-                          href="#"
+                          href="/login"
                           className="text-sm font-medium text-gray-700 hover:text-gray-800"
                         >
                           Login

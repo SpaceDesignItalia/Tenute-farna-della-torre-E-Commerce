@@ -59,7 +59,7 @@ export default function HomeFeatured() {
             Prodotti in primo piano
           </h2>
           <a
-            href="#"
+            href="/store"
             className="hidden text-base font-semibold text-primary hover:text-primary sm:block"
           >
             Esplora tutto
