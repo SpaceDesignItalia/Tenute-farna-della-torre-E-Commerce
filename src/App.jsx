@@ -10,10 +10,11 @@ import ShoppingCart from "./Pages/Cart/ShoppingCart";
 import ProductPage from "./Pages/Store/ProductPage";
 import About from "./Pages/About/About";
 import Login from "./Pages/Login/Login";
-import Dashboard from "./Pages/Dashboard/UserDashboard";
+import Dashboard from "./Pages/PostLogin/Dashboard";
+import Orders from "./Pages/PostLogin/Orders";
 
 export default function App() {
-  const [isAuth, setIsAuth] = useState(false);
+  const [isAuth, setIsAuth] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
   /* useEffect(() => {
@@ -67,6 +68,7 @@ export default function App() {
         </Route>
         <Route element={<ProtectedRoute isAuth={isAuth} />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/orders" element={<Orders />} />
           <Route path="/cart" element={<ShoppingCart />} />
           <Route path="/store" element={<ProductPage />} />
           <Route path="/about" element={<About />} />
