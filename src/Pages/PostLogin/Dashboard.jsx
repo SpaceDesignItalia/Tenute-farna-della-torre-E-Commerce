@@ -41,6 +41,7 @@ function classNames(...classes) {
 
 export default function Dashboard() {
   return (
+      <Cards />
     <section className="bg-gray-100 py-10 px-10 max-w-7xl mx-auto rounded-lg">
       <div className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl sm:px-2 lg:px-8">
