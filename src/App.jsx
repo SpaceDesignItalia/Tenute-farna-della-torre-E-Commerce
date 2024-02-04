@@ -12,6 +12,9 @@ import About from "./Pages/About/About";
 import Login from "./Pages/Login/Login";
 import Dashboard from "./Pages/PostLogin/Dashboard";
 import Orders from "./Pages/PostLogin/Orders";
+import Addresses from "./Pages/PostLogin/Addresses/Addresses";
+import AddAddress from "./Pages/PostLogin/Addresses/AddAddress";
+import EditAddress from "./Pages/PostLogin/Addresses/EditAddress";
 
 export default function App() {
   const [isAuth, setIsAuth] = useState(true);
@@ -69,6 +72,9 @@ export default function App() {
         <Route element={<ProtectedRoute isAuth={isAuth} />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/orders" element={<Orders />} />
+          <Route path="/addresses" element={<Addresses />} />
+          <Route path="/editAddress" element={<EditAddress />} />
+          <Route path="/addAddress" element={<AddAddress />} />
           <Route path="/cart" element={<ShoppingCart />} />
           <Route path="/store" element={<ProductPage />} />
           <Route path="/about" element={<About />} />

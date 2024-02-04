@@ -38,20 +38,14 @@ function classNames(...classes) {
 
 export default function Orders() {
   return (
-    <section className="py-5 bg-gray-100">
-      <div className="max-w-7xl mx-auto">
-        <div>
-          <div className="py-16 sm:py-24">
-            <div className="mx-auto max-w-7xl sm:px-2 lg:px-8">
-              <div className="mx-auto max-w-2xl px-4 lg:max-w-4xl lg:px-0">
-                <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-3xl">
-                  Storico ordini
-                </h1>
-                <p className="mt-2 text-sm text-gray-500">
-                  Controlla lo stato degli ordini recenti.
-                </p>
-              </div>
-            </div>
+    <section className="bg-gray-100 py-10 px-10 max-w-7xl mx-auto rounded-lg">
+      <div className="py-12 sm:py-16">
+        <div className="mx-auto max-w-7xl sm:px-2 lg:px-8">
+          <div className="mx-auto max-w-2xl px-4 lg:max-w-4xl lg:px-0">
+            <h1 className="text-3xl font-bold">Ciao, nome_utente</h1>
+            <p className="mt-2 text-sm text-gray-500">
+              Controlla lo stato degli ordini recenti.
+            </p>
 
             <div className="mt-16">
               <h2 className="sr-only">Ordini recenti</h2>
