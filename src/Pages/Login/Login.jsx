@@ -102,6 +102,7 @@ export default function Login() {
                   <Button
                     onClick={handleSubmit}
                     color="primary"
+                    className="text-white"
                     radius="sm"
                     fullWidth
                   >
