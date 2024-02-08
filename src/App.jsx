@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Route, Routes, Navigate, Outlet } from "react-router-dom";
+import { Routes, Route, Outlet, Navigate } from "react-router-dom";
 import { Spinner } from "@nextui-org/react";
 import axios from "axios";
 import { API_URL } from "./API/API";
-import Home from "./Pages/Home/Home";
 import Navbar from "./Components/Layout/Navbar";
+import Home from "./Pages/Home/Home";
 import Footbar from "./Components/Layout/Footbar";
 import ShoppingCart from "./Pages/Cart/ShoppingCart";
 import ProductPage from "./Pages/Store/ProductPage";
@@ -17,23 +17,27 @@ import AddAddress from "./Pages/PostLogin/Addresses/AddAddress";
 import EditAddress from "./Pages/PostLogin/Addresses/EditAddress";
 
 export default function App() {
-  const [isAuth, setIsAuth] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isAuth, setIsAuth] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  /* useEffect(() => {
+  useEffect(() => {
     axios
-      .get(API_URL + "Auth/CheckSession", { withCredentials: true })
+      .get(API_URL + "/Customer/CheckSession", { withCredentials: true })
       .then((res) => {
-        if (res.status === 200) {
-          setIsAuth(res.data);
+        if (res.status === 200 && res.data) {
+          setIsAuth(true);
+        } else {
+          setIsAuth(false);
         }
-        setIsLoading(false);
       })
       .catch((err) => {
-        console.log(err);
-        setIsLoading(false);
+        console.error("Errore durante il controllo della sessione:", err);
+        setIsAuth(false);
+      })
+      .finally(() => {
+        setIsLoading(false); // Aggiorna lo stato di caricamento quando la richiesta è completata
       });
-  }, []); */
+  }, []);
 
   if (isLoading) {
     return (
@@ -43,44 +47,52 @@ export default function App() {
     );
   }
 
-  const ProtectedRoute = ({ isAuth, redirectPath = "/login" }) => {
-    if (!isAuth) {
-      return <Navigate to={redirectPath} replace />;
-    }
-
-    return <Outlet />;
-  };
-
-  const LoginRoute = ({ isAuth, redirectPath = "/" }) => {
-    if (isAuth) {
-      return <Navigate to={redirectPath} replace />;
-    }
-
-    return <Outlet />;
-  };
-
   return (
     <>
       <Navbar />
       <Routes>
-        <Route element={<LoginRoute isAuth={isAuth} />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/" element={<Home />} />
-          <Route path="/store" element={<ProductPage />} />
-          <Route path="/about" element={<About />} />
-        </Route>
-        <Route element={<ProtectedRoute isAuth={isAuth} />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/addresses" element={<Addresses />} />
-          <Route path="/editAddress" element={<EditAddress />} />
-          <Route path="/addAddress" element={<AddAddress />} />
-          <Route path="/cart" element={<ShoppingCart />} />
-          <Route path="/store" element={<ProductPage />} />
-          <Route path="/about" element={<About />} />
-        </Route>
+        <Route element={<Home />} path="/" />
+        <Route element={<ProductPage />} path="/store" />
+        <Route element={<About />} path="/about" />
+        <Route element={<Login />} path="/login" />
       </Routes>
+      <ProtectedRoutes isAuth={isAuth} />
       <Footbar />
     </>
   );
 }
+
+const ProtectedRoutes = ({ isAuth }) => {
+  // Definiamo i percorsi protetti
+  const protectedPaths = [
+    "/dashboard",
+    "/orders",
+    "/addresses",
+    "/editAddress",
+    "/addAddress",
+    "/cart",
+  ];
+
+  // Verifichiamo se l'utente sta tentando di accedere a un percorso protetto
+  const isAccessingProtectedPath = protectedPaths.some((path) =>
+    window.location.pathname.startsWith(path)
+  );
+
+  // Se l'utente non è autenticato e sta tentando di accedere a un percorso protetto, lo reindirizziamo a /
+  if (!isAuth && isAccessingProtectedPath) {
+    return <Navigate to="/" />;
+  }
+
+  return (
+    <Routes>
+      <Route element={<Outlet />}>
+        <Route element={<Dashboard />} path="/dashboard" />
+        <Route element={<Orders />} path="/orders" />
+        <Route element={<Addresses />} path="/addresses" />
+        <Route element={<EditAddress />} path="/editAddress" />
+        <Route element={<AddAddress />} path="/addAddress" />
+        <Route element={<ShoppingCart />} path="/cart" />
+      </Route>
+    </Routes>
+  );
+};

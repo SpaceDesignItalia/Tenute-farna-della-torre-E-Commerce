@@ -1,4 +1,4 @@
-import { Fragment, useState } from "react";
+import { Fragment, useState, useEffect } from "react";
 import { Dialog, Popover, Tab, Transition } from "@headlessui/react";
 import {
   Bars3Icon,
@@ -8,6 +8,8 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { Button } from "@nextui-org/react";
+import axios from "axios";
+import { API_URL } from "../../API/API";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -15,7 +17,23 @@ function classNames(...classes) {
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const [isAuth, setIsAuth] = useState(true);
+  const [isAuth, setIsAuth] = useState(false);
+
+  useEffect(() => {
+    axios
+      .get(API_URL + "/Customer/CheckSession", { withCredentials: true })
+      .then((res) => {
+        if (res.status === 200 && res.data) {
+          setIsAuth(true);
+        } else {
+          setIsAuth(false);
+        }
+      })
+      .catch((err) => {
+        console.error("Errore durante il controllo della sessione:", err);
+        setIsAuth(false);
+      });
+  }, []);
 
   const navigation = {
     pages: [
