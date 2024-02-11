@@ -50,19 +50,11 @@ export default function App() {
     <>
       <Navbar />
       <Routes>
-        <Route element={<LoginRoute isAuth={isAuth} />}>
-          <Route path="/login" element={<Login />} />
-          <Route path="/" element={<Home />} />
-          <Route path="/store" element={<StorePage />} />
-          <Route path="/product/:productId" element={<ProductPage />} />
-          <Route path="/about" element={<About />} />
-        </Route>
-        <Route element={<ProtectedRoute isAuth={isAuth} />}>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/dashboard/orders" element={<Orders />} />
-          <Route path="/dashboard/addresses" element={<Addresses />} />
-          <Route path="/cart" element={<ShoppingCart />} />
-        </Route>
+        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/store" element={<StorePage />} />
+        <Route path="/product/:productId" element={<ProductPage />} />
+        <Route path="/about" element={<About />} />
       </Routes>
       <ProtectedRoutes isAuth={isAuth} />
       <Footbar />
@@ -97,8 +89,6 @@ const ProtectedRoutes = ({ isAuth }) => {
         <Route element={<Dashboard />} path="/dashboard" />
         <Route element={<Orders />} path="/orders" />
         <Route element={<Addresses />} path="/addresses" />
-        <Route element={<EditAddress />} path="/editAddress" />
-        <Route element={<AddAddress />} path="/addAddress" />
         <Route element={<ShoppingCart />} path="/cart" />
       </Route>
     </Routes>
