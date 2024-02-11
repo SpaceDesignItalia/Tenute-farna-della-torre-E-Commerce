@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import RestoreIcon from "@mui/icons-material/Restore";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
+import axios from "axios";
+import { API_URL } from "../../API/API";
 
 const actions = [
   {
@@ -40,12 +42,24 @@ function classNames(...classes) {
 }
 
 export default function Dashboard() {
+  const [userData, setUserData] = useState({});
+  useEffect(() => {
+    axios
+      .get(API_URL + "/Customer/GetCustomerData", { withCredentials: true })
+      .then((res) => {
+        if (res.status === 200 && res.data) {
+          setUserData(res.data);
+        }
+      });
+  }, []);
   return (
     <section className="py-10 px-10 max-w-7xl mx-auto rounded-lg">
       <div className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl sm:px-2 lg:px-8">
           <div className="mx-auto max-w-2xl px-4 pb-16 lg:max-w-4xl lg:px-0">
-            <h1 className="text-3xl font-bold">Ciao, nome_utente</h1>
+            <h1 className="text-3xl font-bold">
+              Ciao, {userData.name + " " + userData.surname}
+            </h1>
             <p className="mt-5 text-sm text-gray-500">
               Gestisci il tuo account e le tue informazioni personali.
             </p>

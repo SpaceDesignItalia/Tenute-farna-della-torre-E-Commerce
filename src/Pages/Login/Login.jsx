@@ -1,25 +1,54 @@
-import React from "react";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
-import Uva4 from "../../assets/Uva4.jpg";
+import React, { useState } from "react";
+import { Button, Input } from "@nextui-org/react";
+import bg from "../../assets/Uva4.jpg";
+import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
+import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
+import axios from "axios";
+import { API_URL } from "../../API/API";
 
 export default function Login() {
-  const [isVisible, setIsVisible] = React.useState(false);
+  const [loginData, setLoginData] = useState({
+    email: "",
+    password: "",
+  });
+  const [isVisible, setIsVisible] = useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
 
+  function handleSubmit() {
+    axios
+      .post(API_URL + "/Customer/Login", loginData, { withCredentials: true })
+      .then((res) => {
+        if (res.status === 200) {
+          window.location.href = "/dashboard";
+        }
+      });
+  }
+
+  function handleEmailChange(e) {
+    setLoginData({ ...loginData, email: e.target.value });
+  }
+
+  function handlePasswordChange(e) {
+    setLoginData({ ...loginData, password: e.target.value });
+  }
   return (
-    <div className="flex mx-auto h-screen max-w-7xl flex-1">
-      <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
+    <div className="h-screen flex min-h-full flex-1">
+      <div className="w-1/2 flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div>
+            <img
+              className="h-10 w-auto"
+              src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
+              alt="Your Company"
+            />
             <h2 className="mt-8 text-2xl font-bold leading-9 tracking-tight text-gray-900">
-              Entra nel tuo account
+              Accedi al tuo account
             </h2>
           </div>
 
           <div className="mt-10">
             <div>
-              <form action="#" method="POST" className="space-y-6">
+              <form className="space-y-6">
                 <div>
                   <label
                     htmlFor="email"
@@ -28,12 +57,12 @@ export default function Login() {
                     Email
                   </label>
                   <div className="mt-2">
-                    <input
-                      type="email"
-                      name="email"
-                      id="email"
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                      placeholder="Inserire indirizzo mail"
+                    <Input
+                      variant="bordered"
+                      size="sm"
+                      radius="sm"
+                      placeholder="Email"
+                      onChange={handleEmailChange}
                     />
                   </div>
                 </div>
@@ -45,69 +74,50 @@ export default function Login() {
                   >
                     Password
                   </label>
-                  <div className="mt-2 relative">
-                    <input
+                  <div className="mt-2">
+                    <Input
+                      label="Password"
+                      variant="bordered"
+                      placeholder="Enter your password"
+                      endContent={
+                        <button
+                          className="focus:outline-none"
+                          type="button"
+                          onClick={toggleVisibility}
+                        >
+                          {isVisible ? (
+                            <VisibilityOffOutlinedIcon />
+                          ) : (
+                            <RemoveRedEyeOutlinedIcon />
+                          )}
+                        </button>
+                      }
                       type={isVisible ? "text" : "password"}
-                      name="password"
-                      id="password"
-                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                      placeholder="Inserire la password"
+                      onChange={handlePasswordChange}
                     />
-                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                      <button type="button" onClick={toggleVisibility}>
-                        {isVisible ? (
-                          <VisibilityIcon className="text-2xl text-default-400" />
-                        ) : (
-                          <VisibilityOffIcon className="text-2xl text-default-400" />
-                        )}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <input
-                      id="remember-me"
-                      name="remember-me"
-                      type="checkbox"
-                      className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                    />
-                    <label
-                      htmlFor="remember-me"
-                      className="ml-3 block text-sm leading-6 text-gray-700"
-                    >
-                      Ricordami
-                    </label>
-                  </div>
-
-                  <div className="text-sm leading-6">
-                    <a
-                      href="#"
-                      className="font-semibold text-indigo-600 hover:text-indigo-500"
-                    >
-                      Password dimenticata?
-                    </a>
                   </div>
                 </div>
 
                 <div>
-                  <button
-                    type="submit"
-                    className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                  <Button
+                    onClick={handleSubmit}
+                    color="primary"
+                    className="text-white"
+                    radius="sm"
+                    fullWidth
                   >
                     Accedi
-                  </button>
+                  </Button>
                 </div>
               </form>
             </div>
           </div>
         </div>
       </div>
-      <div className="relative hidden h-2/3 my-auto w-0 flex-1 lg:block md:max-w-full">
+      <div className="relative hidden w-0 flex-1 lg:block">
         <img
-          className="absolute inset-0 h-full w-full object-cover rounded-xl"
-          src={Uva4}
+          className="absolute inset-0 h-full w-full object-cover"
+          src={bg}
           alt=""
         />
       </div>

@@ -10,5 +10,15 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [nextui(), require("@tailwindcss/forms")],
+  plugins: [
+    nextui({
+      themes: {
+        light: {
+          colors: {
+            primary: "#c9a86a",
+          },
+        },
+      },
+    }),
+  ],
 };
