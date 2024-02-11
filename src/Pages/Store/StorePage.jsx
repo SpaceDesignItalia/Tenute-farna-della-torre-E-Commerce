@@ -11,7 +11,7 @@ const products = [
   {
     id: 1,
     name: "Lorem ipsum",
-    href: "#",
+    href: "/product/1",
     price: 256,
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -22,7 +22,7 @@ const products = [
   {
     id: 2,
     name: "Lorem ipsum",
-    href: "#",
+    href: "/product/2",
     price: 32,
     description:
       "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
@@ -33,7 +33,7 @@ const products = [
   },
 ];
 
-export default function ProductPage() {
+export default function StorePage() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [tempValue, setTempValue] = useState([0, 300]);
   const [tempOrderBy, setTempOrderBy] = useState("empty");
@@ -179,7 +179,7 @@ export default function ProductPage() {
                     </RadioGroup>
                     <h2 className="text-lg font-semibold pt-5">Filtra per</h2>
                     <h3 className="text-sm font-semibold pt-2">Prezzo</h3>
-                    <div className="flex flex-row gap-5">
+                    <div className="flex flex-row gap-3">
                       <Input
                         variant="faded"
                         type="number"
@@ -195,6 +195,10 @@ export default function ProductPage() {
                             </span>
                           </div>
                         }
+                        style={{
+                          border: "none",
+                          borderBottom: "1px solid #d2d6dc",
+                        }}
                       />
                       <Input
                         variant="faded"
@@ -212,6 +216,10 @@ export default function ProductPage() {
                             </span>
                           </div>
                         }
+                        style={{
+                          border: "none",
+                          borderBottom: "1px solid #d2d6dc",
+                        }}
                       />
                     </div>
                     <Slider
@@ -280,7 +288,7 @@ export default function ProductPage() {
                   </RadioGroup>
                   <h2 className="text-lg font-semibold pt-3">Filtra per</h2>
                   <h3 className="text-sm font-semibold">Prezzo</h3>
-                  <div className="flex flex-row gap-5">
+                  <div className="flex flex-row gap-3">
                     <Input
                       variant="faded"
                       type="number"
@@ -294,7 +302,12 @@ export default function ProductPage() {
                           <span className="text-default-400 text-small">€</span>
                         </div>
                       }
+                      style={{
+                        border: "none",
+                        borderBottom: "1px solid #d2d6dc",
+                      }}
                     />
+
                     <Input
                       variant="faded"
                       type="number"
@@ -309,6 +322,10 @@ export default function ProductPage() {
                           <span className="text-default-400 text-small">€</span>
                         </div>
                       }
+                      style={{
+                        border: "none",
+                        borderBottom: "1px solid #d2d6dc",
+                      }}
                     />
                   </div>
                   <Slider

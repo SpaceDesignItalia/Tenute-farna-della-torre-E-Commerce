@@ -10,5 +10,15 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [nextui()],
+  plugins: [
+    nextui({
+      themes: {
+        light: {
+          colors: {
+            primary: "#c9a86a",
+          },
+        },
+      },
+    }),
+  ],
 };
