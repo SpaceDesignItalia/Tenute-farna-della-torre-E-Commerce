@@ -1,5 +1,4 @@
 import React from "react";
-import { Input } from "@nextui-org/react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import VisibilityOffIcon from "@mui/icons-material/VisibilityOff";
 import Uva4 from "../../assets/Uva4.jpg";
@@ -7,8 +6,9 @@ import Uva4 from "../../assets/Uva4.jpg";
 export default function Login() {
   const [isVisible, setIsVisible] = React.useState(false);
   const toggleVisibility = () => setIsVisible(!isVisible);
+
   return (
-    <div className="flex mx-auto min-h-full max-w-7xl flex-1">
+    <div className="flex mx-auto h-screen max-w-7xl flex-1">
       <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div>
@@ -21,36 +21,48 @@ export default function Login() {
             <div>
               <form action="#" method="POST" className="space-y-6">
                 <div>
+                  <label
+                    htmlFor="email"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Email
+                  </label>
                   <div className="mt-2">
-                    <Input
-                      isClearable
+                    <input
                       type="email"
-                      label="Email"
-                      variant="bordered"
-                      placeholder="Inserisci la tua email"
-                      onClear={() => console.log("input cleared")}
-                      className="w-full"
+                      name="email"
+                      id="email"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      placeholder="Inserire indirizzo mail"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Input
-                    label="Password"
-                    variant="bordered"
-                    placeholder="Inserisci la tua password"
-                    endContent={
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium leading-6 text-gray-900"
+                  >
+                    Password
+                  </label>
+                  <div className="mt-2 relative">
+                    <input
+                      type={isVisible ? "text" : "password"}
+                      name="password"
+                      id="password"
+                      className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                      placeholder="Inserire la password"
+                    />
+                    <div className="absolute inset-y-0 right-0 flex items-center pr-3">
                       <button type="button" onClick={toggleVisibility}>
                         {isVisible ? (
-                          <VisibilityIcon className="text-2xl text-default-400 pointer-events-none" />
+                          <VisibilityIcon className="text-2xl text-default-400" />
                         ) : (
-                          <VisibilityOffIcon className="text-2xl text-default-400 pointer-events-none" />
+                          <VisibilityOffIcon className="text-2xl text-default-400" />
                         )}
                       </button>
-                    }
-                    type={isVisible ? "text" : "password"}
-                    className="w-full"
-                  />
+                    </div>
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-between">
@@ -84,7 +96,7 @@ export default function Login() {
                     type="submit"
                     className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                   >
-                    Sign in
+                    Accedi
                   </button>
                 </div>
               </form>
@@ -92,9 +104,9 @@ export default function Login() {
           </div>
         </div>
       </div>
-      <div className="relative hidden w-0 flex-1 lg:block md:max-w-full">
+      <div className="relative hidden h-2/3 my-auto w-0 flex-1 lg:block md:max-w-full">
         <img
-          className="absolute inset-0 h-full w-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover rounded-xl"
           src={Uva4}
           alt=""
         />

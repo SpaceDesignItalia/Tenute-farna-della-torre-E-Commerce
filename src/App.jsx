@@ -7,17 +7,16 @@ import Home from "./Pages/Home/Home";
 import Navbar from "./Components/Layout/Navbar";
 import Footbar from "./Components/Layout/Footbar";
 import ShoppingCart from "./Pages/Cart/ShoppingCart";
-import ProductPage from "./Pages/Store/ProductPage";
+import StorePage from "./Pages/Store/StorePage";
 import About from "./Pages/About/About";
 import Login from "./Pages/Login/Login";
 import Dashboard from "./Pages/PostLogin/Dashboard";
 import Orders from "./Pages/PostLogin/Orders";
 import Addresses from "./Pages/PostLogin/Addresses/Addresses";
-import AddAddress from "./Pages/PostLogin/Addresses/AddAddress";
-import EditAddress from "./Pages/PostLogin/Addresses/EditAddress";
+import ProductPage from "./Pages/Product/ProductPage";
 
 export default function App() {
-  const [isAuth, setIsAuth] = useState(true);
+  const [isAuth, setIsAuth] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   /* useEffect(() => {
@@ -66,18 +65,15 @@ export default function App() {
         <Route element={<LoginRoute isAuth={isAuth} />}>
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<Home />} />
-          <Route path="/store" element={<ProductPage />} />
+          <Route path="/store" element={<StorePage />} />
+          <Route path="/product/:productId" element={<ProductPage />} />
           <Route path="/about" element={<About />} />
         </Route>
         <Route element={<ProtectedRoute isAuth={isAuth} />}>
           <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/orders" element={<Orders />} />
-          <Route path="/addresses" element={<Addresses />} />
-          <Route path="/editAddress" element={<EditAddress />} />
-          <Route path="/addAddress" element={<AddAddress />} />
+          <Route path="/dashboard/orders" element={<Orders />} />
+          <Route path="/dashboard/addresses" element={<Addresses />} />
           <Route path="/cart" element={<ShoppingCart />} />
-          <Route path="/store" element={<ProductPage />} />
-          <Route path="/about" element={<About />} />
         </Route>
       </Routes>
       <Footbar />

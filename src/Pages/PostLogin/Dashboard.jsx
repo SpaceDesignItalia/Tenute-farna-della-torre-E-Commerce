@@ -7,14 +7,14 @@ import { BanknotesIcon } from "@heroicons/react/24/outline";
 const actions = [
   {
     title: "Storico ordini",
-    href: "/orders",
+    href: "/dashboard/orders",
     icon: RestoreIcon,
     iconForeground: "text-teal-700",
     iconBackground: "bg-teal-50",
   },
   {
     title: "Indirizzi",
-    href: "/addresses",
+    href: "/dashboard/addresses",
     icon: HomeOutlinedIcon,
     iconForeground: "text-purple-700",
     iconBackground: "bg-purple-50",
@@ -41,7 +41,7 @@ function classNames(...classes) {
 
 export default function Dashboard() {
   return (
-    <section className="bg-gray-100 py-10 px-10 max-w-7xl mx-auto rounded-lg">
+    <section className="py-10 px-10 max-w-7xl mx-auto rounded-lg">
       <div className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl sm:px-2 lg:px-8">
           <div className="mx-auto max-w-2xl px-4 pb-16 lg:max-w-4xl lg:px-0">
@@ -51,7 +51,7 @@ export default function Dashboard() {
             </p>
           </div>
           <div className="max-w-5xl mx-auto">
-            <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-gray-200 shadow sm:grid sm:grid-cols-2 sm:gap-px sm:divide-y-0">
+            <div className="divide-y divide-gray-200 overflow-hidden rounded-lg bg-gray-200 shadow-lg sm:grid sm:grid-cols-2 sm:gap-px sm:divide-y-0">
               {actions.map((action, actionIdx) => (
                 <div
                   key={action.title}

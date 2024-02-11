@@ -38,7 +38,7 @@ function classNames(...classes) {
 
 export default function Orders() {
   return (
-    <section className="bg-gray-100 py-10 px-10 max-w-7xl mx-auto rounded-lg">
+    <section className="py-10 px-10 max-w-7xl mx-auto rounded-lg">
       <div className="py-12 sm:py-16">
         <div className="mx-auto max-w-7xl sm:px-2 lg:px-8">
           <div className="mx-auto max-w-2xl px-4 lg:max-w-4xl lg:px-0">
