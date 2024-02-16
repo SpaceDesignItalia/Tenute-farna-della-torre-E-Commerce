@@ -58,10 +58,10 @@ export default function Login() {
                   </label>
                   <div className="mt-2">
                     <Input
+                      label="Email"
                       variant="bordered"
                       size="sm"
                       radius="sm"
-                      placeholder="Email"
                       onChange={handleEmailChange}
                     />
                   </div>
@@ -78,7 +78,6 @@ export default function Login() {
                     <Input
                       label="Password"
                       variant="bordered"
-                      placeholder="Enter your password"
                       endContent={
                         <button
                           className="focus:outline-none"
@@ -86,9 +85,9 @@ export default function Login() {
                           onClick={toggleVisibility}
                         >
                           {isVisible ? (
-                            <VisibilityOffOutlinedIcon />
-                          ) : (
                             <RemoveRedEyeOutlinedIcon />
+                          ) : (
+                            <VisibilityOffOutlinedIcon />
                           )}
                         </button>
                       }
