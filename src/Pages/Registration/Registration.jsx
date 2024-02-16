@@ -55,8 +55,14 @@ export default function Registration() {
         password: "",
         confermaPassword: "",
       });
+      setTimeout(() => {
+        setIsRegistrationSuccess(false);
+      }, 3000); // Nascondi l'alert di successo dopo 3 secondi
     } else {
       setIncompleteForm(true);
+      setTimeout(() => {
+        setIncompleteForm(false);
+      }, 3000); // Nascondi l'alert di errore dopo 3 secondi
     }
   };
 
@@ -223,8 +229,8 @@ export default function Registration() {
         </div>
       </div>
       {isRegistrationSuccess && (
-        <div className="fixed mt-20 top-0 left-0 right-0 z-50 mx-auto w-max-3xl">
-          <div className="rounded-md max-w-3xl mx-auto bg-green-50 p-4 border border-green-300">
+        <div className="fixed top-20 right-20 z-50">
+          <div className="rounded-md max-w-sm mx-auto bg-green-50 p-4 border border-green-300 transition-all duration-500 opacity-100">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <CheckCircleIcon
@@ -241,9 +247,10 @@ export default function Registration() {
           </div>
         </div>
       )}
+
       {incompleteForm && (
-        <div className="fixed mt-20 top-0 left-0 right-0 z-50 mx-auto w-max-3xl">
-          <div className="rounded-md max-w-3xl mx-auto bg-red-50 p-4 border border-red-300">
+        <div className="fixed top-20 right-20 z-50">
+          <div className="rounded-md max-w-sm mx-auto bg-red-50 p-4 border border-red-300 transition-all duration-500 opacity-100">
             <div className="flex items-center">
               <div className="flex-shrink-0">
                 <XCircleIcon
