@@ -252,7 +252,7 @@ export default function Navbar() {
                           aria-hidden="true"
                         />
                         <a
-                          href="#"
+                          href="/registration"
                           className="text-sm font-medium text-gray-700 hover:text-gray-800"
                         >
                           Crea account

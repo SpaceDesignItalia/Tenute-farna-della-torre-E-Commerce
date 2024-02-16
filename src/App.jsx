@@ -7,17 +7,17 @@ import Navbar from "./Components/Layout/Navbar";
 import Home from "./Pages/Home/Home";
 import Footbar from "./Components/Layout/Footbar";
 import ShoppingCart from "./Pages/Cart/ShoppingCart";
-import StorePage from "./Pages/Store/StorePage";
+import ProductPage from "./Pages/Product/ProductPage";
 import About from "./Pages/About/About";
 import Login from "./Pages/Login/Login";
 import Dashboard from "./Pages/PostLogin/Dashboard";
 import Orders from "./Pages/PostLogin/Orders";
 import Addresses from "./Pages/PostLogin/Addresses/Addresses";
-import ProductPage from "./Pages/Product/ProductPage";
+import Registration from "./Pages/Registration/Registration";
 
 export default function App() {
   const [isAuth, setIsAuth] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     axios
@@ -50,11 +50,11 @@ export default function App() {
     <>
       <Navbar />
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/" element={<Home />} />
-        <Route path="/store" element={<StorePage />} />
-        <Route path="/product/:productId" element={<ProductPage />} />
-        <Route path="/about" element={<About />} />
+        <Route element={<Home />} path="/" />
+        <Route element={<ProductPage />} path="/store" />
+        <Route element={<About />} path="/about" />
+        <Route element={<Login />} path="/login" />
+        <Route element={<Registration />} path="/registration" />
       </Routes>
       <ProtectedRoutes isAuth={isAuth} />
       <Footbar />
@@ -87,8 +87,8 @@ const ProtectedRoutes = ({ isAuth }) => {
     <Routes>
       <Route element={<Outlet />}>
         <Route element={<Dashboard />} path="/dashboard" />
-        <Route element={<Orders />} path="/orders" />
-        <Route element={<Addresses />} path="/addresses" />
+        <Route element={<Orders />} path="/dashboard/orders" />
+        <Route element={<Addresses />} path="/dashboard/addresses" />
         <Route element={<ShoppingCart />} path="/cart" />
       </Route>
     </Routes>
