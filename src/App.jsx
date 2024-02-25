@@ -8,6 +8,7 @@ import Home from "./Pages/Home/Home";
 import Footbar from "./Components/Layout/Footbar";
 import ShoppingCart from "./Pages/Cart/ShoppingCart";
 import ProductPage from "./Pages/Product/ProductPage";
+import StorePage from "./Pages/Store/StorePage";
 import About from "./Pages/About/About";
 import Login from "./Pages/Login/Login";
 import Dashboard from "./Pages/PostLogin/Dashboard";
@@ -51,7 +52,11 @@ export default function App() {
       <Navbar />
       <Routes>
         <Route element={<Home />} path="/" />
-        <Route element={<ProductPage />} path="/store" />
+        <Route element={<StorePage />} path="/store" />
+        <Route
+          element={<ProductPage />}
+          path="/store/product/:id/:productName"
+        />
         <Route element={<About />} path="/about" />
         <Route element={<Login />} path="/login" />
         <Route element={<Registration />} path="/registration" />
