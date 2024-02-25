@@ -1,142 +1,119 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import { API_URL } from "../../API/API";
 
 export default function HomeFeatured() {
-  const products = [
-    {
-      id: 1,
-      name: "Machined Pen",
-      price: 35,
-      discountValue: 10,
-      discountType: 1,
-      href: "#",
-      imageSrc:
-        "https://tailwindui.com/img/ecommerce-images/home-page-02-product-01.jpg",
-      imageAlt:
-        "Black machined steel pen with hexagonal grip and small white logo at top.",
-    },
-    {
-      id: 2,
-      name: "Machined Pen",
-      price: 35,
-      discountValue: 20,
-      discountType: 2,
-      href: "#",
-      imageSrc:
-        "https://tailwindui.com/img/ecommerce-images/home-page-02-product-01.jpg",
-      imageAlt:
-        "Black machined steel pen with hexagonal grip and small white logo at top.",
-    },
-    {
-      id: 3,
-      name: "Machined Pen",
-      price: 35,
-      discountValue: 0,
-      discountType: null,
-      href: "#",
-      imageSrc:
-        "https://tailwindui.com/img/ecommerce-images/home-page-02-product-01.jpg",
-      imageAlt:
-        "Black machined steel pen with hexagonal grip and small white logo at top.",
-    },
-    {
-      id: 4,
-      name: "Machined Pen",
-      price: 35,
-      discountValue: 0,
-      discountType: null,
-      href: "#",
-      imageSrc:
-        "https://tailwindui.com/img/ecommerce-images/home-page-02-product-01.jpg",
-      imageAlt:
-        "Black machined steel pen with hexagonal grip and small white logo at top.",
-    },
-  ];
-  return (
-    <div className="bg-white">
-      <div className="py-16 sm:py-24 lg:mx-auto lg:max-w-7xl lg:px-8">
-        <div className="flex items-center justify-center sm:justify-between px-4 sm:px-6 lg:px-0">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900">
-            Prodotti in primo piano
-          </h2>
-          <a
-            href="/store"
-            className="hidden text-base font-semibold text-primary hover:text-primary sm:block"
-          >
-            Esplora tutto
-            <span aria-hidden="true"> &rarr;</span>
-          </a>
-        </div>
+  const [products, setProducts] = useState([]);
+  useEffect(() => {
+    axios.get(API_URL + "/Featured/GetAll").then((res) => {
+      setProducts(res.data);
+    });
+  }, []);
 
-        <div className="relative mt-8">
-          <div className="relative -mb-6 w-full overflow-x-auto pb-6">
-            <ul
-              role="list"
-              className="mx-4 inline-flex space-x-8 sm:mx-6 lg:mx-0 lg:grid lg:grid-cols-4 lg:gap-x-8 lg:space-x-0 justify-center items-center"
-            >
-              {products.map((product) => (
-                <li
-                  key={product.id}
-                  className="inline-flex w-64 flex-col text-center lg:w-auto"
+  const calculateDiscountedPrice = (product) => {
+    if (product.idDiscountType === null) {
+      return <>€{product.unitPrice.toFixed(2)}</>;
+    } else if (product.idDiscountType === 1) {
+      const discountedPrice = product.unitPrice - product.value;
+      return <>€{discountedPrice.toFixed(2)}</>;
+    } else if (product.idDiscountType === 2) {
+      const discountedPrice =
+        product.unitPrice - product.unitPrice * (product.value / 100);
+      return (
+        <div className="flex flex-row gap-5 items-center">
+          <div className="line-through text-lg text-gray-500">
+            €{product.unitPrice.toFixed(2)}
+          </div>
+          €{discountedPrice.toFixed(2)}
+        </div>
+      );
+    }
+  };
+
+  return (
+    <>
+      {products && (
+        <div className="bg-white">
+          <div className="py-16 sm:py-24 lg:mx-auto lg:max-w-7xl lg:px-8">
+            <div className="flex items-center justify-center sm:justify-between px-4 sm:px-6 lg:px-0">
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900">
+                Prodotti in primo piano
+              </h2>
+              <a
+                href="/store"
+                className="hidden text-base font-semibold text-primary hover:text-primary sm:block"
+              >
+                Esplora tutto
+                <span aria-hidden="true"> &rarr;</span>
+              </a>
+            </div>
+
+            <div className="relative mt-8">
+              <div className="relative -mb-6 w-full overflow-x-auto pb-6">
+                <ul
+                  role="list"
+                  className="mx-4 inline-flex space-x-8 sm:mx-6 lg:mx-0 lg:grid lg:grid-cols-4 lg:gap-x-8 lg:space-x-0 justify-center items-center"
                 >
-                  <div className="group relative">
-                    <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200">
-                      <img
-                        src={product.imageSrc}
-                        alt={product.imageAlt}
-                        className="h-full w-full object-cover object-center group-hover:opacity-75"
-                      />
-                    </div>
-                    <div className="mt-6">
-                      <h3 className="mt-1 font-semibold text-gray-900">
-                        <a href={product.href}>
-                          <span className="absolute inset-0" />
-                          {product.name}
-                        </a>
-                      </h3>
-                      <div className="flex flex-row justify-center items-center gap-2">
-                        <p
-                          className={
-                            product.discountType < 1
-                              ? "text-gray-900"
-                              : "text-gray-900 line-through"
-                          }
-                        >
-                          € {product.price.toFixed(2)}
-                        </p>
-                        <p>
-                          {product.discountType > 1 && (
-                            <span className="text-gray-900">€ </span>
-                          )}
-                          {product.discountType === 1 &&
-                            product.price.toFixed(2) -
-                              (product.price.toFixed(2) *
-                                product.discountValue) /
-                                100}
-                          {product.discountType === 2 &&
-                            (
-                              product.price.toFixed(2) -
-                              product.discountValue.toFixed(2)
-                            ).toFixed(2)}
-                        </p>
+                  {products.map((product) => (
+                    <li
+                      key={product.id}
+                      className="inline-flex w-64 flex-col text-center lg:w-auto"
+                    >
+                      <div className="group relative">
+                        <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200">
+                          <img
+                            src={
+                              API_URL + "/uploads/" + product.productImagePath
+                            }
+                            alt={product.imageAlt}
+                            className="h-full w-full object-cover object-center group-hover:opacity-75"
+                          />
+                        </div>
+                        <div className="mt-6">
+                          <h3 className="mt-1 font-semibold text-gray-900">
+                            <a
+                              href={
+                                "/store/product/" +
+                                product.idProduct +
+                                "/" +
+                                product.productName
+                              }
+                            >
+                              <span className="absolute inset-0" />
+                              {product.productName}
+                            </a>
+                          </h3>
+                          <div className="flex flex-row justify-center items-center gap-2">
+                            <p
+                              className={
+                                product.discountType < 1
+                                  ? "text-gray-900"
+                                  : "text-gray-900 line-through"
+                              }
+                            >
+                              {calculateDiscountedPrice(product)}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="mt-12 flex px-4 sm:hidden">
+              <a
+                href="#"
+                className="text-base font-semibold text-primary hover:text-primary"
+              >
+                Esplora tutto
+                <span aria-hidden="true"> &rarr;</span>
+              </a>
+            </div>
           </div>
         </div>
-
-        <div className="mt-12 flex px-4 sm:hidden">
-          <a
-            href="#"
-            className="text-base font-semibold text-primary hover:text-primary"
-          >
-            Esplora tutto
-            <span aria-hidden="true"> &rarr;</span>
-          </a>
-        </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }

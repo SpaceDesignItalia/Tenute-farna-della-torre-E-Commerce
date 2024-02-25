@@ -7,7 +7,7 @@ import {
   UserIcon,
   XMarkIcon,
 } from "@heroicons/react/24/outline";
-import { Button } from "@nextui-org/react";
+import Logo from "../../assets/logo.png";
 import axios from "axios";
 import { API_URL } from "../../API/API";
 
@@ -43,7 +43,7 @@ export default function Navbar() {
     ],
   };
   return (
-    <div className="bg-white">
+    <div className=" sticky top-0 bg-white z-50">
       {/* Mobile menu */}
       <Transition.Root show={open} as={Fragment}>
         <Dialog as="div" className="relative z-40 lg:hidden" onClose={setOpen}>
@@ -151,11 +151,7 @@ export default function Navbar() {
                 <div className="hidden lg:flex lg:items-center">
                   <a href="/">
                     <span className="sr-only">Your Company</span>
-                    <img
-                      className="h-8 w-auto"
-                      src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                      alt=""
-                    />
+                    <img className="h-16 w-auto" src={Logo} alt="" />
                   </a>
                 </div>
 
@@ -191,11 +187,7 @@ export default function Navbar() {
                 {/* Logo (lg-) */}
                 <a href="#" className="lg:hidden">
                   <span className="sr-only">Your Company</span>
-                  <img
-                    src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-                    alt=""
-                    className="h-8 w-auto"
-                  />
+                  <img src={Logo} alt="" className="h-16 w-auto" />
                 </a>
 
                 <div className="flex flex-1 items-center justify-end">

@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react";
 import RestoreIcon from "@mui/icons-material/Restore";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import ManageAccountsOutlinedIcon from "@mui/icons-material/ManageAccountsOutlined";
-import { BanknotesIcon } from "@heroicons/react/24/outline";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 import axios from "axios";
 import { API_URL } from "../../API/API";
 
 const actions = [
   {
     title: "Storico ordini",
+    description: "Lorem ipsum dolor sit amet",
     href: "/dashboard/orders",
     icon: RestoreIcon,
     iconForeground: "text-teal-700",
@@ -16,6 +17,7 @@ const actions = [
   },
   {
     title: "Indirizzi",
+    description: "Lorem ipsum dolor sit amet",
     href: "/dashboard/addresses",
     icon: HomeOutlinedIcon,
     iconForeground: "text-purple-700",
@@ -23,17 +25,19 @@ const actions = [
   },
   {
     title: "Informazioni personali",
+    description: "Lorem ipsum dolor sit amet",
     href: "#",
     icon: ManageAccountsOutlinedIcon,
     iconForeground: "text-sky-700",
     iconBackground: "bg-sky-50",
   },
   {
-    title: "Lorem ipsum",
-    href: "",
-    icon: BanknotesIcon,
-    iconForeground: "text-yellow-700",
-    iconBackground: "bg-yellow-50",
+    title: "Logout", // Aggiungi un nuovo elemento per il logout
+    description: "Esci dal profilo",
+    href: "/", // Puoi specificare l'endpoint di logout qui
+    icon: LogoutOutlinedIcon, // Cambia l'icona a tua scelta
+    iconForeground: "text-red-700", // Cambia il colore dell'icona a tua scelta
+    iconBackground: "bg-red-50", // Cambia il colore di sfondo dell'icona a tua scelta
   },
 ];
 
@@ -52,6 +56,13 @@ export default function Dashboard() {
         }
       });
   }, []);
+
+  function handleLogout() {
+    axios
+      .get(API_URL + "/Customer/Logout", { withCredentials: true })
+      .then((window.location.href = "/"));
+  }
+
   return (
     <section className="py-10 px-10 max-w-7xl mx-auto rounded-lg">
       <div className="py-12 sm:py-16">
@@ -94,14 +105,22 @@ export default function Dashboard() {
                   </div>
                   <div className="mt-8">
                     <h3 className="text-base font-semibold leading-6 text-gray-900">
-                      <a href={action.href} className="focus:outline-none">
+                      <a
+                        href={actionIdx !== 3 ? action.href : undefined}
+                        onClick={actionIdx === 3 ? handleLogout : undefined}
+                        className={
+                          actionIdx !== 3
+                            ? "focus:outline-none"
+                            : "focus:outline-none cursor-pointer"
+                        }
+                      >
                         {/* Extend touch target to entire panel */}
                         <span className="absolute inset-0" aria-hidden="true" />
                         {action.title}
                       </a>
                     </h3>
                     <p className="mt-2 text-sm text-gray-500">
-                      Lorem ipsum dolor sit amet
+                      {action.description}
                     </p>
                   </div>
                   <span
