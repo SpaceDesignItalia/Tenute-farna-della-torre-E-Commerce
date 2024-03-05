@@ -6,34 +6,11 @@ import { Slider } from "@nextui-org/react";
 import { Input } from "@nextui-org/react";
 import { Button } from "@nextui-org/react";
 import { Spinner } from "@nextui-org/react";
-
-const products = [
-  {
-    id: 1,
-    name: "Lorem ipsum",
-    href: "/product/1",
-    price: 256,
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    options: "Options",
-    imageSrc: "https://m.media-amazon.com/images/I/71d2aeO3uKL.jpg",
-    imageAlt: "Office content 1",
-  },
-  {
-    id: 2,
-    name: "Lorem ipsum",
-    href: "/product/2",
-    price: 32,
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    options: "Options",
-    imageSrc:
-      "https://s.tannico.it/media/catalog/product/cache/1/thumbnail/500x500/0dc2d03fe217f8c83829496872af24a0/d/p/dp13_2.jpg",
-    imageAlt: "Office content 2",
-  },
-];
+import axios from "axios";
+import { API_URL } from "../../API/API";
 
 export default function StorePage() {
+  const [products, setProducts] = useState([]);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [tempValue, setTempValue] = useState([0, 300]);
   const [tempOrderBy, setTempOrderBy] = useState("empty");
@@ -42,6 +19,13 @@ export default function StorePage() {
   const [value, setValue] = useState([0, 300]);
   const [orderBy, setOrderBy] = useState("empty");
   const [filteredProducts, setFilteredProducts] = useState(products);
+
+  useEffect(() => {
+    axios.get(API_URL + "/Products/GetProductsEcommerce").then((res) => {
+      setProducts(res.data);
+      console.log(res.data);
+    });
+  }, []);
 
   const updateFilteredProducts = () => {
     const filtered = products.filter((product) => {
@@ -84,40 +68,32 @@ export default function StorePage() {
     });
   };
 
-  useEffect(() => {
-    let isMounted = true;
-
-    const fetchData = async () => {
-      try {
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-
-        if (isMounted) {
-          updateFilteredProducts();
-          setIsLoading(false);
-        }
-      } catch (error) {
-        console.error("Errore durante il caricamento dei dati:", error);
-        if (isMounted) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    if (tempValue !== value || tempOrderBy !== orderBy) {
-      fetchData(); // Chiamata API solo se i filtri sono diversi
-    }
-
-    return () => {
-      isMounted = false;
-    };
-  }, [tempValue, tempOrderBy, value, orderBy]);
-
   const handleTempPriceChange = (newRange) => {
     setTempValue(newRange);
   };
 
   const handleTempOrderChange = (value) => {
     setTempOrderBy(value);
+  };
+
+  const calculateDiscountedPrice = (product) => {
+    if (product.idDiscountType === null) {
+      return <>€{product.unitPrice.toFixed(2)}</>;
+    } else if (product.idDiscountType === 1) {
+      const discountedPrice = product.unitPrice - product.value;
+      return <>€{discountedPrice.toFixed(2)}</>;
+    } else if (product.idDiscountType === 2) {
+      const discountedPrice =
+        product.unitPrice - product.unitPrice * (product.value / 100);
+      return (
+        <div className="flex flex-row gap-5 items-center">
+          <div className="line-through text-lg text-gray-500">
+            €{product.unitPrice.toFixed(2)}
+          </div>
+          €{discountedPrice.toFixed(2)}
+        </div>
+      );
+    }
   };
 
   return (
@@ -356,56 +332,50 @@ export default function StorePage() {
                 Products
               </h2>
 
-              {isLoading ? (
-                <div className="flex items-center justify-center h-96">
-                  <Spinner label="Caricamento..." color="primary" />
-                </div>
-              ) : filteredProducts.length === 0 ? (
-                <div className="flex items-center justify-center h-96">
-                  <p className="text-2xl text-gray-500">
-                    Nessun prodotto disponibile
-                  </p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:gap-x-8 xl:grid-cols-3">
-                  {filteredProducts.map((product) => (
-                    <div
-                      key={product.id}
-                      className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
-                    >
-                      <div className="aspect-h-4 aspect-w-3 bg-gray-200 sm:aspect-none group-hover:opacity-75 sm:h-96">
-                        <img
-                          src={product.imageSrc}
-                          alt={product.imageAlt}
-                          className="h-full w-full object-cover object-center sm:h-full sm:w-full"
-                        />
-                      </div>
-                      <div className="flex flex-1 flex-col space-y-2 p-4">
-                        <h3 className="text-sm font-medium text-gray-900">
-                          <a href={product.href}>
-                            <span
-                              aria-hidden="true"
-                              className="absolute inset-0"
-                            />
-                            {product.name}
-                          </a>
-                        </h3>
-                        <p className="text-sm text-gray-500">
-                          {product.description}
+              <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:gap-x-8 xl:grid-cols-3">
+                {products.map((product) => (
+                  <div
+                    key={product.idProduct}
+                    className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
+                  >
+                    <div className="aspect-h-4 aspect-w-3 bg-gray-200 sm:aspect-none group-hover:opacity-75 sm:h-96">
+                      <img
+                        src={API_URL + "/uploads/" + product.productImagePath}
+                        className="h-full w-full object-cover object-center sm:h-full sm:w-full"
+                      />
+                    </div>
+                    <div className="flex flex-1 flex-col space-y-2 p-4">
+                      <h3 className="text-sm font-medium text-gray-900">
+                        <a
+                          href={
+                            "/store/product/" +
+                            product.idProduct +
+                            "/" +
+                            product.productName
+                          }
+                        >
+                          <span
+                            aria-hidden="true"
+                            className="absolute inset-0"
+                          />
+                          {product.productName}
+                        </a>
+                      </h3>
+                      <div
+                        className="text-sm text-gray-500"
+                        dangerouslySetInnerHTML={{
+                          __html: product.productDescription,
+                        }}
+                      />
+                      <div className="flex flex-1 flex-col justify-end">
+                        <p className="text-base font-medium text-gray-900">
+                          {calculateDiscountedPrice(product)}
                         </p>
-                        <div className="flex flex-1 flex-col justify-end">
-                          <p className="text-sm italic text-gray-500">
-                            {product.options}
-                          </p>
-                          <p className="text-base font-medium text-gray-900">
-                            €{product.price}
-                          </p>
-                        </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              )}
+                  </div>
+                ))}
+              </div>
             </section>
           </div>
         </main>
