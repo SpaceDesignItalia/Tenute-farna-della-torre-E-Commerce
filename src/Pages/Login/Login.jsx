@@ -36,11 +36,6 @@ export default function Login() {
       <div className="w-1/2 flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
         <div className="mx-auto w-full max-w-sm lg:w-96">
           <div>
-            <img
-              className="h-10 w-auto"
-              src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=600"
-              alt="Your Company"
-            />
             <h2 className="mt-8 text-2xl font-bold leading-9 tracking-tight text-gray-900">
               Accedi al tuo account
             </h2>
@@ -94,6 +89,14 @@ export default function Login() {
                       type={isVisible ? "text" : "password"}
                       onChange={handlePasswordChange}
                     />
+                  </div>
+                  <div class="text-sm text-end mx-3 py-2">
+                    <a
+                      href="/recover/recover-account"
+                      class="font-semibold text-indigo-600 hover:text-indigo-500"
+                    >
+                      Password dimenticata?
+                    </a>
                   </div>
                 </div>
 
