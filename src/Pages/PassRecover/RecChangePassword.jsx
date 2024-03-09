@@ -15,16 +15,20 @@ export default function RecChangePassword() {
     confermaPassword: "",
   });
   const [passwordsMatch, setPasswordsMatch] = useState(true);
+  const { email } = useParams();
   const { token } = useParams();
   const [success, setSuccess] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [incompleteForm, setIncompleteForm] = useState(false);
+  const [samePassword, setSamePassword] = useState(false);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
   useEffect(() => {
     axios
-      .get(`${API_URL}/Customer/CheckOTP/${token}`, { withCredentials: true })
+      .get(API_URL + "/Customer/CheckOTP/" + email + "/" + token, {
+        withCredentials: true,
+      })
       .then((res) => {
         if (res.status === 200 && res.data) {
           setSuccess(true);
@@ -67,9 +71,10 @@ export default function RecChangePassword() {
     }
 
     axios
-      .post(
-        `${API_URL}/Customer/UpdatePassword/${token}`,
+      .put(
+        API_URL + "/Customer/UpdateCustomerPasswordByEmail",
         {
+          email: email,
           password: formValues.password,
         },
         { withCredentials: true }
@@ -77,12 +82,18 @@ export default function RecChangePassword() {
       .then((res) => {
         if (res.status === 200 && res.data) {
           console.log("Password aggiornata con successo!");
+          window.location.href = "/recover/passchanged/" + email + "/" + token;
         } else {
           console.error("Errore durante l'aggiornamento della password.");
         }
       })
       .catch((err) => {
         console.error("Errore durante l'aggiornamento della password:", err);
+        setSamePassword(true);
+        setTimeout(() => {
+          setSamePassword(false);
+        }, 5000);
+        console.error("Errore durante l'aggiornamento della password.");
       });
   };
 
@@ -203,6 +214,26 @@ export default function RecChangePassword() {
                     <h2 className="text-sm font-medium text-red-800">
                       Compila tutti i campi e assicurati che le password
                       coincidano.
+                    </h2>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          {samePassword && (
+            <div className="fixed top-20 right-20 z-50">
+              <div className="rounded-md max-w-sm mx-auto bg-red-50 p-4 border border-red-300 transition-all duration-500 opacity-100">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <XCircleIcon
+                      className="h-5 w-5 text-red-400"
+                      aria-hidden="true"
+                    />
+                  </div>
+                  <div className="ml-3">
+                    <h2 className="text-sm font-medium text-red-800">
+                      Errore durante l'aggiornamento della password: è probabile
+                      che la password inserita sia uguale a quella attuale.
                     </h2>
                   </div>
                 </div>

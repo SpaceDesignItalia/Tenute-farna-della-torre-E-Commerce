@@ -18,6 +18,7 @@ import Registration from "./Pages/Registration/Registration";
 import PassRecover from "./Pages/PassRecover/PassRecover";
 import RecMailSent from "./Pages/PassRecover/RecMailSent";
 import RecChangePassword from "./Pages/PassRecover/RecChangePassword";
+import RecoverSuccess from "./Pages/PassRecover/RecoverSuccess";
 
 export default function App() {
   const [isAuth, setIsAuth] = useState(false);
@@ -67,7 +68,11 @@ export default function App() {
         <Route element={<RecMailSent />} path="/recover/mailsent" />
         <Route
           element={<RecChangePassword />}
-          path="/recover/reset-password/:token"
+          path="/recover/reset-password/:email/:token"
+        />
+        <Route
+          element={<RecoverSuccess />}
+          path="/recover/passchanged/:email/:token"
         />
       </Routes>
       <ProtectedRoutes isAuth={isAuth} />
