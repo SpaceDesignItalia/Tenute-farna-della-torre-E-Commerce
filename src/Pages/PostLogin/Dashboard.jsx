@@ -25,8 +25,8 @@ const actions = [
   },
   {
     title: "Informazioni personali",
-    description: "Lorem ipsum dolor sit amet",
-    href: "#",
+    description: "Modifica le tue informazioni personali",
+    href: "/dashboard/settings",
     icon: ManageAccountsOutlinedIcon,
     iconForeground: "text-sky-700",
     iconBackground: "bg-sky-50",
@@ -52,7 +52,7 @@ export default function Dashboard() {
       .get(API_URL + "/Customer/GetCustomerData", { withCredentials: true })
       .then((res) => {
         if (res.status === 200 && res.data) {
-          setUserData(res.data);
+          setUserData(res.data.customer);
         }
       });
   }, []);
