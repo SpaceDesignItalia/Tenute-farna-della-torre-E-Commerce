@@ -16,6 +16,8 @@ import Orders from "./Pages/PostLogin/Orders/Orders";
 import Addresses from "./Pages/PostLogin/Addresses/Addresses";
 import Registration from "./Pages/Registration/Registration";
 import AccountInfo from "./Pages/PostLogin/AccountInfo/AccountInfo";
+import TermsAndCondition from "./Pages/Documents/TermsAndCondition";
+import PrivacyPolicy from "./Pages/Documents/PrivacyPolicy";
 
 export default function App() {
   const [isAuth, setIsAuth] = useState(false);
@@ -61,6 +63,8 @@ export default function App() {
         <Route element={<About />} path="/about" />
         <Route element={<Login />} path="/login" />
         <Route element={<Registration />} path="/registration" />
+        <Route element={<TermsAndCondition />} path="/termini-e-condizioni" />
+        <Route element={<PrivacyPolicy />} path="/privacy-policy" />
       </Routes>
       <ProtectedRoutes isAuth={isAuth} />
       <Footbar />

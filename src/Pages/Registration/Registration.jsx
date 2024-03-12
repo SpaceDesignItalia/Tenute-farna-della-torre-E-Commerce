@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Button, Input } from "@nextui-org/react";
+import React, { useState } from "react";
+import { Button, Input, Checkbox, Link } from "@nextui-org/react";
 import RemoveRedEyeOutlinedIcon from "@mui/icons-material/RemoveRedEyeOutlined";
 import VisibilityOffOutlinedIcon from "@mui/icons-material/VisibilityOffOutlined";
 import { Snackbar, Alert, AlertTitle } from "@mui/material";
@@ -71,21 +71,18 @@ export default function Registration() {
       formValues.phone !== "" &&
       formValues.mail !== ""
     ) {
-      if (
+      return !!(
         formValues.password !== "" &&
         formValues.confermaPassword === formValues.password
-      ) {
-        return true;
-      } else {
-        return false;
-      }
+      );
     } else {
       return false;
     }
   }
+  console.log();
 
   const handleRegister = async () => {
-    console.log(isValid());
+    event.preventDefault();
     try {
       if (isValid() === true) {
         const response = await axios.post(
@@ -283,13 +280,25 @@ export default function Registration() {
                       />
                     </div>
                   </div>
+                  <div className="mt-2">
+                    <Checkbox className="text-white" isRequired>
+                      Accetto i{" "}
+                      <Link href="/termini-e-condizioni">
+                        Termini e Condizioni
+                      </Link>{" "}
+                      e la <Link href="/privacy-policy">Privacy Policy</Link>{" "}
+                      per la registrazione dell'account.
+                    </Checkbox>
+                  </div>
                   <div>
                     <Button
+                      type="submit"
                       color="primary"
                       className="text-white"
                       radius="sm"
                       fullWidth
                       onClick={handleRegister}
+                      isDisabled={!isValid()}
                       isLoading={isCreating}
                     >
                       Crea account

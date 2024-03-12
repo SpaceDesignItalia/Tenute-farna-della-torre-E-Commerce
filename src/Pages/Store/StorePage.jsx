@@ -1,11 +1,15 @@
 import { Fragment, useEffect, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { XMarkIcon, PlusIcon } from "@heroicons/react/24/outline";
-import { RadioGroup, Radio } from "@nextui-org/react";
-import { Slider } from "@nextui-org/react";
-import { Input } from "@nextui-org/react";
-import { Button } from "@nextui-org/react";
-import { Spinner } from "@nextui-org/react";
+import { XMarkIcon } from "@heroicons/react/24/outline";
+import TuneRoundedIcon from "@mui/icons-material/TuneRounded";
+import {
+  Input,
+  Button,
+  Slider,
+  Chip,
+  RadioGroup,
+  Radio,
+} from "@nextui-org/react";
 import axios from "axios";
 import { API_URL } from "../../API/API";
 
@@ -96,6 +100,18 @@ export default function StorePage() {
     }
   };
 
+  function discountDisplay(product) {
+    if (product.idDiscountType !== null) {
+      if (product.idDiscountType === 1) {
+        return <p className="text-white">- €{product.value}</p>;
+      } else {
+        return <p className="text-white">-{product.value}%</p>;
+      }
+    } else {
+      return <></>;
+    }
+  }
+
   return (
     <div className="bg-white">
       <div>
@@ -171,10 +187,6 @@ export default function StorePage() {
                             </span>
                           </div>
                         }
-                        style={{
-                          border: "none",
-                          borderBottom: "1px solid #d2d6dc",
-                        }}
                       />
                       <Input
                         variant="faded"
@@ -192,10 +204,6 @@ export default function StorePage() {
                             </span>
                           </div>
                         }
-                        style={{
-                          border: "none",
-                          borderBottom: "1px solid #d2d6dc",
-                        }}
                       />
                     </div>
                     <Slider
@@ -225,11 +233,15 @@ export default function StorePage() {
         <main className="mx-auto max-w-2xl px-4 lg:max-w-7xl lg:px-8">
           <div className="border-b border-gray-200 pb-10 pt-24">
             <h1 className="text-4xl font-bold tracking-tight text-gray-900">
-              Lorem ipsum
+              Vino e prodotti agricoli selezionati
             </h1>
             <p className="mt-4 text-base text-gray-500">
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-              eiusmod tempor incididunt ut labore et dolore magna aliqua.
+              Benvenuto nel nostro negozio online dedicato al mondo del vino e
+              dei prodotti agricoli. Scopri una selezione curata di vini
+              pregiati e prodotti genuini direttamente dalla terra. Scegli tra
+              una vasta gamma di varietà e assapora l'autenticità dei nostri
+              prodotti. Utilizza i filtri per trovare esattamente ciò che cerchi
+              e immergiti nell'esperienza del gusto.
             </p>
           </div>
 
@@ -245,7 +257,8 @@ export default function StorePage() {
                 <span className="text-sm font-medium text-gray-700">
                   Filtri
                 </span>
-                <PlusIcon
+
+                <TuneRoundedIcon
                   className="ml-1 h-5 w-5 flex-shrink-0 text-gray-400"
                   aria-hidden="true"
                 />
@@ -278,10 +291,6 @@ export default function StorePage() {
                           <span className="text-default-400 text-small">€</span>
                         </div>
                       }
-                      style={{
-                        border: "none",
-                        borderBottom: "1px solid #d2d6dc",
-                      }}
                     />
 
                     <Input
@@ -298,10 +307,6 @@ export default function StorePage() {
                           <span className="text-default-400 text-small">€</span>
                         </div>
                       }
-                      style={{
-                        border: "none",
-                        borderBottom: "1px solid #d2d6dc",
-                      }}
                     />
                   </div>
                   <Slider
@@ -336,8 +341,11 @@ export default function StorePage() {
                 {products.map((product) => (
                   <div
                     key={product.idProduct}
-                    className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white"
+                    className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white p-2"
                   >
+                    <Chip color="primary" radius="sm">
+                      {discountDisplay(product)}
+                    </Chip>
                     <div className="aspect-h-4 aspect-w-3 bg-gray-200 sm:aspect-none group-hover:opacity-75 sm:h-96">
                       <img
                         src={API_URL + "/uploads/" + product.productImagePath}

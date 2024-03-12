@@ -30,6 +30,22 @@ export default function HomeFeatured() {
     }
   };
 
+  function discountDisplay(product) {
+    if (product.idDiscountType !== null) {
+      if (product.idDiscountType === 1) {
+        return (
+          <p className="font-semibold text-gray-600">Sconto €{product.value}</p>
+        );
+      } else {
+        return (
+          <p className="font-semibold text-gray-600">Sconto {product.value}%</p>
+        );
+      }
+    } else {
+      return <></>;
+    }
+  }
+
   return (
     <>
       {products && (
@@ -44,16 +60,15 @@ export default function HomeFeatured() {
                 className="hidden text-base font-semibold text-primary hover:text-primary sm:block"
               >
                 Esplora tutto
-                <span aria-hidden="true"> &rarr;</span>
+                {/*
+                 */}
+                <span aria-hidden="true">&rarr;</span>
               </a>
             </div>
 
             <div className="relative mt-8">
               <div className="relative -mb-6 w-full overflow-x-auto pb-6">
-                <ul
-                  role="list"
-                  className="mx-4 inline-flex space-x-8 sm:mx-6 lg:mx-0 lg:grid lg:grid-cols-4 lg:gap-x-8 lg:space-x-0 justify-center items-center"
-                >
+                <ul className="mx-4 inline-flex space-x-8 sm:mx-6 lg:mx-0 lg:grid lg:grid-cols-4 lg:gap-x-8 lg:space-x-0 justify-center items-center">
                   {products.map((product) => (
                     <li
                       key={product.id}
@@ -83,16 +98,11 @@ export default function HomeFeatured() {
                               {product.productName}
                             </a>
                           </h3>
-                          <div className="flex flex-row justify-center items-center gap-2">
-                            <p
-                              className={
-                                product.discountType < 1
-                                  ? "text-gray-900"
-                                  : "text-gray-900 line-through"
-                              }
-                            >
+                          <div className="flex flex-col justify-center items-center gap-2">
+                            <p className="text-gray-900">
                               {calculateDiscountedPrice(product)}
                             </p>
+                            {discountDisplay(product)}
                           </div>
                         </div>
                       </div>
@@ -104,11 +114,13 @@ export default function HomeFeatured() {
 
             <div className="mt-12 flex px-4 sm:hidden">
               <a
-                href="#"
+                href="/store"
                 className="text-base font-semibold text-primary hover:text-primary"
               >
                 Esplora tutto
-                <span aria-hidden="true"> &rarr;</span>
+                {/*
+                 */}
+                <span aria-hidden="true">&rarr;</span>
               </a>
             </div>
           </div>

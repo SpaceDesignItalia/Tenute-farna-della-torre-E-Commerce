@@ -1,6 +1,18 @@
-import { useEffect, useState } from "react";
-import { Tabs, Tab, Spinner, Input, Button } from "@nextui-org/react";
+import { useEffect, useState, useRef } from "react";
+import {
+  Tabs,
+  Tab,
+  Spinner,
+  Input,
+  Button,
+  Image,
+  Select,
+  SelectSection,
+  SelectItem,
+} from "@nextui-org/react";
 import { Snackbar, Alert, AlertTitle } from "@mui/material";
+import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
+import FileUploadRoundedIcon from "@mui/icons-material/FileUploadRounded";
 import axios from "axios";
 import { API_URL } from "../../../API/API";
 function classNames(...classes) {
@@ -11,6 +23,7 @@ export default function AccountInfo() {
   const tabs = [
     { name: "Account", content: <GeneralSettings /> },
     { name: "Password", content: <ManagePassword /> },
+    { name: "Documenti", content: <ManageDocument /> },
   ];
 
   return (
@@ -439,9 +452,9 @@ function ManagePassword() {
 
   useEffect(() => {
     axios
-      .get(API_URL + "/Staffer/GetStafferData", { withCredentials: true })
+      .get(API_URL + "/Customer/GetCustomerData", { withCredentials: true })
       .then((res) => {
-        setData({ ...data, id: res.data.staffer.id });
+        setData({ ...data, id: res.data.customer.id });
       });
   }, []);
 
@@ -482,30 +495,38 @@ function ManagePassword() {
   }
 
   const handleUpdateData = async () => {
-    setAlertData({
-      ...alertData,
-      isOpen: true,
-      variant: "success",
-      title: "Dati aggiornati",
-      message: "I dati sono stati aggiornati correttamente",
-    });
-
     try {
       const response = await axios.put(
-        API_URL + "/Staffer/UpdateStafferPassword",
+        API_URL + "/Customer/UpdateCustomerPassword",
         {
           id: data.id,
+          oldPassword: data.oldPassword,
           password: data.newPassword,
         },
         { withCredentials: true }
       );
       setIsUpdatingData(true);
       if (response.status === 200) {
+        setAlertData({
+          ...alertData,
+          isOpen: true,
+          variant: "success",
+          title: "Dati aggiornati",
+          message: "I dati sono stati aggiornati correttamente",
+        });
         setTimeout(() => {
           location.reload();
         }, 1000);
       }
     } catch (error) {
+      setAlertData({
+        ...alertData,
+        isOpen: true,
+        variant: "error",
+        title: "Aggiornamento Password Fallito",
+        message: "La vecchia password inserita non è corretta.",
+      });
+
       console.error("Errore durante l'aggiunta del prodotto", error);
     }
   };
@@ -597,12 +618,216 @@ function ManagePassword() {
       <div className="mt-6 flex items-center justify-center lg:justify-end gap-x-6">
         <Button
           color="primary"
+          className="text-white"
           radius="sm"
           isDisabled={enableSubmit()}
           onClick={handleUpdateData}
           isLoading={isUpdatingData}
         >
           {isUpdatingData ? "Aggiornamento in corso" : "Salva modifiche"}
+        </Button>
+      </div>
+    </>
+  );
+}
+
+function ManageDocument() {
+  const [alertData, setAlertData] = useState({
+    isOpen: false,
+    variant: "",
+    title: "",
+    message: "",
+  });
+  const [newDocument, setNewDocument] = useState({
+    idDocument: "",
+  });
+  const [isAddingProduct, setIsAddingProduct] = useState(false);
+  const [photos, setPhotos] = useState([]);
+  const fileInputRef = useRef(null);
+
+  function enableSubmit() {
+    if (newDocument.idDocument !== "" && photos.length !== 0) {
+      return false;
+    }
+    return true;
+  }
+
+  const handleAddProduct = async () => {
+    const trimmedProductName = newProduct.productName.trim();
+    const formData = new FormData();
+
+    // Aggiungi i dati del nuovo prodotto
+    formData.append("productName", trimmedProductName);
+    formData.append("productDescription", newProduct.productDescription);
+    formData.append("productAmount", newProduct.productAmount);
+    formData.append("unitPrice", newProduct.unitPrice);
+    formData.append("isDiscount", newProduct.isDiscount);
+
+    // Aggiungi le immagini del prodotto
+    photos.forEach((photo, index) => {
+      formData.append(`photo${index + 1}`, photo.file);
+    });
+
+    try {
+      const response = await axios.post(
+        API_URL + "/Products/CreateProduct",
+        formData
+      );
+      setIsAddingProduct(true);
+      if (response.status === 201) {
+        setTimeout(() => {
+          window.location.href = "/products";
+        }, 1000);
+      }
+    } catch (error) {
+      console.error("Errore durante l'aggiunta del prodotto", error);
+    }
+  };
+
+  const handleClose = (event, reason) => {
+    setAlertData({
+      ...alertData,
+      isOpen: false,
+      variant: "",
+      title: "",
+      message: "",
+    });
+  };
+
+  const handleFileChange = (e) => {
+    const selectedFiles = e.target.files;
+
+    // Limit the number of selected files to 5
+    const selectedFilesArray = Array.from(selectedFiles).slice(0, 5);
+
+    // Convert each file to an object with additional properties if needed
+    const photoObjects = selectedFilesArray.map((file) => ({
+      file,
+      // You can add more properties here, such as a caption or other metadata
+    }));
+
+    setPhotos((prevPhotos) => [...prevPhotos, ...photoObjects]);
+  };
+
+  const handleRemovePhoto = (index) => {
+    // Rimuovi la foto corrispondente all'indice dall'array
+    const updatedPhotos = [...photos];
+    updatedPhotos.splice(index, 1);
+    setPhotos(updatedPhotos);
+  };
+  return (
+    <>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        open={alertData.isOpen}
+        autoHideDuration={3000}
+        onClose={handleClose}
+      >
+        <Alert size="lg" severity={alertData.variant} sx={{ width: "100%" }}>
+          <AlertTitle sx={{ fontWeight: "bold" }}>{alertData.title}</AlertTitle>
+          {alertData.message}
+        </Alert>
+      </Snackbar>
+
+      <div className="mt-10 divide-y divide-gray-200">
+        <div className="space-y-1">
+          <h3 className="text-lg font-medium leading-6 text-gray-900">
+            Documenti
+          </h3>
+          <p className="max-w-2xl text-sm text-gray-500">
+            Inserisci una foto fronte retro del documento.
+          </p>
+        </div>
+        <div className="mt-6">
+          <dl className="divide-y divide-gray-200">
+            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+              <dt className="text-sm font-medium text-gray-500">
+                Tipo di documento
+              </dt>
+              <dd className="mt-1 flex text-sm text-gray-900 sm:col-span-2 sm:mt-0 items-center">
+                <span className="flex-grow">
+                  <Select
+                    label="Seleziona un tipo di documento"
+                    className="max-w-xs"
+                    size="sm"
+                    radius="sm"
+                    variant="bordered"
+                  >
+                    <SelectItem key={1} value={1}>
+                      Carta di identità
+                    </SelectItem>
+                    <SelectItem key={2} value={2}>
+                      Passaporto
+                    </SelectItem>
+                    <SelectItem key={3} value={3}>
+                      Patente di guida
+                    </SelectItem>
+                  </Select>
+                </span>
+              </dd>
+              <label
+                htmlFor="first-name"
+                className="block text-sm font-medium leading-6 text-gray-900 sm:pt-1.5"
+              >
+                Foto del documento
+              </label>
+              <div className="flex flex-col gap-10">
+                <Alert variant="outlined" severity="warning">
+                  Dimensioni consigliate per l'immagine: <br /> 500x500 pixel.
+                </Alert>
+                {photos.map((photo, index) => (
+                  <div key={index} className="flex flex-row gap-5 items-center">
+                    <Image
+                      isBordered
+                      radius="sm"
+                      size="lg"
+                      width={200}
+                      height={200}
+                      src={URL.createObjectURL(photo.file)}
+                    />
+                    <Button
+                      isIconOnly
+                      className="bg-red-500 text-white"
+                      radius="sm"
+                      onClick={() => handleRemovePhoto(index)}
+                    >
+                      <DeleteRoundedIcon />{" "}
+                    </Button>
+                  </div>
+                ))}
+
+                {photos.length < 2 && (
+                  <label className="relative inline-flex justify-center items-center bg-primary text-white px-4 py-2 rounded-md cursor-pointer w-full">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => handleFileChange(e)}
+                      className="hidden"
+                      ref={fileInputRef}
+                    />
+                    <FileUploadRoundedIcon />
+                    {photos.length === 0 ? (
+                      <span>Carica fronte</span>
+                    ) : (
+                      <span>Carica retro {photos.length + "/" + 2}</span>
+                    )}
+                  </label>
+                )}
+              </div>
+            </div>
+          </dl>
+        </div>
+      </div>
+      <div className="mt-6 flex items-center justify-center lg:justify-end gap-x-6">
+        <Button
+          color="primary"
+          className="text-white"
+          radius="sm"
+          isDisabled={enableSubmit()}
+          onClick={handleAddProduct}
+          isLoading={isAddingProduct}
+        >
+          {isAddingProduct ? "Aggiornamento in corso" : "Salva modifiche"}
         </Button>
       </div>
     </>
