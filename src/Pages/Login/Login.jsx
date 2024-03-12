@@ -90,6 +90,14 @@ export default function Login() {
                       onChange={handlePasswordChange}
                     />
                   </div>
+                  <div class="text-sm text-end mx-3 py-2">
+                    <a
+                      href="/recover/recover-account"
+                      class="font-semibold text-indigo-600 hover:text-indigo-500"
+                    >
+                      Password dimenticata?
+                    </a>
+                  </div>
                 </div>
 
                 <div>
