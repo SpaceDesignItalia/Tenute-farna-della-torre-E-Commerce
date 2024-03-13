@@ -16,7 +16,6 @@ import Orders from "./Pages/PostLogin/Orders";
 import Addresses from "./Pages/PostLogin/Addresses/Addresses";
 import Registration from "./Pages/Registration/Registration";
 import PassRecover from "./Pages/PassRecover/PassRecover";
-import RecMailSent from "./Pages/PassRecover/RecMailSent";
 import RecChangePassword from "./Pages/PassRecover/RecChangePassword";
 import RecoverSuccess from "./Pages/PassRecover/RecoverSuccess";
 
@@ -65,7 +64,6 @@ export default function App() {
         <Route element={<Login />} path="/login" />
         <Route element={<Registration />} path="/registration" />
         <Route element={<PassRecover />} path="/recover/recover-account" />
-        <Route element={<RecMailSent />} path="/recover/mailsent" />
         <Route
           element={<RecChangePassword />}
           path="/recover/reset-password/:email/:token"
