@@ -81,34 +81,59 @@ export default function StorePage() {
   };
 
   const calculateDiscountedPrice = (product) => {
-    if (product.idDiscountType === null) {
-      return <>€{product.unitPrice.toFixed(2)}</>;
-    } else if (product.idDiscountType === 1) {
-      const discountedPrice = product.unitPrice - product.value;
-      return <>€{discountedPrice.toFixed(2)}</>;
-    } else if (product.idDiscountType === 2) {
-      const discountedPrice =
-        product.unitPrice - product.unitPrice * (product.value / 100);
+    const currentDate = new Date();
+    const discountStartDate = product.startDate
+      ? new Date(product.startDate)
+      : null;
+    if (currentDate > discountStartDate) {
+      if (product.idDiscountType === null) {
+        return <>€{product.unitPrice.toFixed(2)}</>;
+      } else if (product.idDiscountType === 1) {
+        const discountedPrice = product.unitPrice - product.value;
+        return <>€{discountedPrice.toFixed(2)}</>;
+      } else if (product.idDiscountType === 2) {
+        const discountedPrice =
+          product.unitPrice - product.unitPrice * (product.value / 100);
+        return (
+          <div className="flex flex-row gap-5 items-center">
+            <div className="line-through text-lg text-gray-500">
+              €{product.unitPrice.toFixed(2)}
+            </div>
+            €{discountedPrice.toFixed(2)}
+          </div>
+        );
+      }
+    } else {
       return (
         <div className="flex flex-row gap-5 items-center">
-          <div className="line-through text-lg text-gray-500">
-            €{product.unitPrice.toFixed(2)}
-          </div>
-          €{discountedPrice.toFixed(2)}
+          €{product.unitPrice.toFixed(2)}
         </div>
       );
     }
   };
 
   function discountDisplay(product) {
-    if (product.idDiscountType !== null) {
+    const currentDate = new Date();
+    const discountStartDate = product.startDate
+      ? new Date(product.startDate)
+      : null;
+
+    if (product.idDiscountType !== null && currentDate > discountStartDate) {
       if (product.idDiscountType === 1) {
-        return <p className="text-white">- €{product.value}</p>;
+        return (
+          <Chip color="primary" radius="sm">
+            <p className="text-white">- €{product.value}</p>
+          </Chip>
+        );
       } else {
-        return <p className="text-white">-{product.value}%</p>;
+        return (
+          <Chip color="primary" radius="sm">
+            <p className="text-white">-{product.value}%</p>
+          </Chip>
+        );
       }
     } else {
-      return <></>;
+      return <></>; // Non mostra sconto se la data di inizio non è ancora passata
     }
   }
 
@@ -343,9 +368,7 @@ export default function StorePage() {
                     key={product.idProduct}
                     className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white p-2"
                   >
-                    <Chip color="primary" radius="sm">
-                      {discountDisplay(product)}
-                    </Chip>
+                    {discountDisplay(product)}
                     <div className="aspect-h-4 aspect-w-3 bg-gray-200 sm:aspect-none group-hover:opacity-75 sm:h-96">
                       <img
                         src={API_URL + "/uploads/" + product.productImagePath}
