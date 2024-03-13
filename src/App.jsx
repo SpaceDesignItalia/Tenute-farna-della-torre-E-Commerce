@@ -12,9 +12,12 @@ import StorePage from "./Pages/Store/StorePage";
 import About from "./Pages/About/About";
 import Login from "./Pages/Login/Login";
 import Dashboard from "./Pages/PostLogin/Dashboard";
-import Orders from "./Pages/PostLogin/Orders";
+import Orders from "./Pages/PostLogin/Orders/Orders";
 import Addresses from "./Pages/PostLogin/Addresses/Addresses";
 import Registration from "./Pages/Registration/Registration";
+import AccountInfo from "./Pages/PostLogin/AccountInfo/AccountInfo";
+import TermsAndCondition from "./Pages/Documents/TermsAndCondition";
+import PrivacyPolicy from "./Pages/Documents/PrivacyPolicy";
 import PassRecover from "./Pages/PassRecover/PassRecover";
 import RecChangePassword from "./Pages/PassRecover/RecChangePassword";
 import RecoverSuccess from "./Pages/PassRecover/RecoverSuccess";
@@ -104,6 +107,7 @@ const ProtectedRoutes = ({ isAuth }) => {
     <Routes>
       <Route element={<Outlet />}>
         <Route element={<Dashboard />} path="/dashboard" />
+        <Route element={<AccountInfo />} path="/dashboard/settings" />
         <Route element={<Orders />} path="/dashboard/orders" />
         <Route element={<Addresses />} path="/dashboard/addresses" />
         <Route element={<ShoppingCart />} path="/cart" />
