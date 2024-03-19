@@ -27,57 +27,41 @@ export default function StorePage() {
   useEffect(() => {
     axios.get(API_URL + "/Products/GetProductsEcommerce").then((res) => {
       setProducts(res.data);
-      console.log(res.data);
+      setFilteredProducts(res.data);
     });
   }, []);
 
-  const updateFilteredProducts = () => {
-    const filtered = products.filter((product) => {
-      const priceInRange =
-        product.price >= tempValue[0] && product.price <= tempValue[1];
-
-      if (tempOrderBy === "ASC") {
-        return priceInRange;
-      } else if (tempOrderBy === "DESC") {
-        return priceInRange;
-      } else {
-        // Se l'ordinamento non è specificato, restituisci tutti i prodotti nel range di prezzo
-        return priceInRange;
-      }
-    });
-
-    setFilteredProducts(filtered);
-  };
-
-  const applyFilters = async () => {
+  const applyFiltersAndSort = async () => {
     setIsLoading(true);
-
-    await new Promise((resolve) => {
-      setTimeout(async () => {
-        setValue(tempValue);
-        setOrderBy(tempOrderBy);
-        setMobileFiltersOpen(false);
-
-        // Chiamata API effettiva
-        try {
-          await new Promise((resolve) => setTimeout(resolve, 2000));
-          updateFilteredProducts();
-        } catch (error) {
-          console.error("Errore durante il caricamento dei dati:", error);
-        } finally {
-          setIsLoading(false);
-          resolve(); // Risolvi la promessa dopo aver completato il caricamento
+    try {
+      const response = await axios.get(
+        API_URL + "/Products/FilterAndSortProducts",
+        {
+          params: {
+            minPrice: tempValue[0],
+            maxPrice: tempValue[1],
+            orderBy: tempOrderBy,
+          },
         }
-      }, 0);
-    });
+      );
+
+      setFilteredProducts(response.data);
+    } catch (error) {
+      console.error(
+        "Errore durante il recupero dei prodotti filtrati e ordinati:",
+        error
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleTempPriceChange = (newRange) => {
     setTempValue(newRange);
   };
 
-  const handleTempOrderChange = (value) => {
-    setTempOrderBy(value);
+  const handleTempOrderByChange = (event) => {
+    setTempOrderBy(event.target.value);
   };
 
   const calculateDiscountedPrice = (product) => {
@@ -187,7 +171,7 @@ export default function StorePage() {
                   <form className="mt-4 px-5">
                     <RadioGroup
                       defaultValue={tempOrderBy}
-                      onChange={handleTempOrderChange}
+                      onChange={handleTempOrderByChange}
                     >
                       <h2 className="text-lg font-semibold">Ordina per</h2>
                       <Radio value="empty">Nulla</Radio>
@@ -243,7 +227,7 @@ export default function StorePage() {
                       aria-label="Prezzo"
                     />
                     <Button
-                      onClick={applyFilters}
+                      onClick={applyFiltersAndSort}
                       className="w-full bg-primary text-white mt-3"
                     >
                       Applica
@@ -293,7 +277,7 @@ export default function StorePage() {
                 <form className="space-y-3 divide-gray-200">
                   <RadioGroup
                     defaultValue={orderBy}
-                    onChange={handleTempOrderChange}
+                    onChange={handleTempOrderByChange}
                   >
                     <h2 className="text-lg font-semibold">Ordina per</h2>
                     <Radio value="empty">Nulla</Radio>
@@ -345,7 +329,7 @@ export default function StorePage() {
                     aria-label="Prezzo"
                   />
                   <Button
-                    onClick={applyFilters}
+                    onClick={applyFiltersAndSort}
                     className="w-full bg-primary text-white"
                   >
                     Applica
@@ -363,7 +347,7 @@ export default function StorePage() {
               </h2>
 
               <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6 sm:gap-y-10 lg:gap-x-8 xl:grid-cols-3">
-                {products.map((product) => (
+                {filteredProducts.map((product) => (
                   <div
                     key={product.idProduct}
                     className="group relative flex flex-col overflow-hidden rounded-lg border border-gray-200 bg-white p-2"
