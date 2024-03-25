@@ -41,20 +41,32 @@ export default function ProductPage() {
   }, []);
 
   const calculateDiscountedPrice = () => {
-    if (product.idDiscountType === null) {
-      return <>€{product.unitPrice.toFixed(2)}</>;
-    } else if (product.idDiscountType === 1) {
-      const discountedPrice = product.unitPrice - product.value;
-      return <>€{discountedPrice.toFixed(2)}</>;
-    } else if (product.idDiscountType === 2) {
-      const discountedPrice =
-        product.unitPrice - product.unitPrice * (product.value / 100);
+    const currentDate = new Date();
+    const discountStartDate = product.startDate
+      ? new Date(product.startDate)
+      : null;
+    if (currentDate > discountStartDate) {
+      if (product.idDiscountType === null) {
+        return <>€{product.unitPrice.toFixed(2)}</>;
+      } else if (product.idDiscountType === 1) {
+        const discountedPrice = product.unitPrice - product.value;
+        return <>€{discountedPrice.toFixed(2)}</>;
+      } else if (product.idDiscountType === 2) {
+        const discountedPrice =
+          product.unitPrice - product.unitPrice * (product.value / 100);
+        return (
+          <div className="flex flex-row gap-5 items-center">
+            <div className="line-through text-lg text-gray-500">
+              €{product.unitPrice.toFixed(2)}
+            </div>
+            €{discountedPrice.toFixed(2)}
+          </div>
+        );
+      }
+    } else {
       return (
         <div className="flex flex-row gap-5 items-center">
-          <div className="line-through text-lg text-gray-500">
-            €{product.unitPrice.toFixed(2)}
-          </div>
-          €{discountedPrice.toFixed(2)}
+          €{product.unitPrice.toFixed(2)}
         </div>
       );
     }
