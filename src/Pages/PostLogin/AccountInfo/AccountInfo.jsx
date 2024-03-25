@@ -104,7 +104,6 @@ function GeneralSettings() {
           email: res.data.customer.email,
           phone: res.data.customer.phone,
         });
-        console.log(res.data);
       });
   }, []);
 
@@ -638,31 +637,67 @@ function ManageDocument() {
     title: "",
     message: "",
   });
-  const [newDocument, setNewDocument] = useState({
-    idDocument: "",
+  const [isLoadingDocument, setIsLoadingDocument] = useState(false);
+  const [data, setData] = useState({
+    id: "",
+    documentType: "",
   });
-  const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [photos, setPhotos] = useState([]);
+  const [imagesLoaded, setImagesLoaded] = useState(false);
   const fileInputRef = useRef(null);
 
-  function enableSubmit() {
-    if (newDocument.idDocument !== "" && photos.length !== 0) {
-      return false;
+  useEffect(() => {
+    axios
+      .get(API_URL + "/Customer/GetCustomerData", { withCredentials: true })
+      .then((res) => {
+        setData({
+          ...data,
+          id: res.data.customer.id,
+        });
+      })
+      .catch((error) => {
+        console.error(
+          "Errore durante il recupero dei dati del cliente:",
+          error
+        );
+      });
+  }, []);
+
+  useEffect(() => {
+    if (data.id !== "" && !imagesLoaded) {
+      axios
+        .get(API_URL + "/Customer/GetImagesByCustomerId/" + data.id)
+        .then((res) => {
+          setPhotos(res.data);
+          if (res.data.length === 0)
+            // Check if the array is empty
+            setImagesLoaded(false);
+          // Set imagesLoaded to false if photos array is empty
+          else setImagesLoaded(true); // Otherwise set it to true
+        })
+        .catch((error) => {
+          console.error(
+            "Errore durante il recupero delle immagini del cliente:",
+            error
+          );
+        });
     }
-    return true;
+  }, [data.id, imagesLoaded]);
+
+  function enableSubmit() {
+    if (photos.length === 2) {
+      return false;
+    } else {
+      return true;
+    }
   }
 
-  const handleAddProduct = async () => {
-    const trimmedProductName = newProduct.productName.trim();
+  const handleSendDocument = async () => {
     const formData = new FormData();
 
     // Aggiungi i dati del nuovo prodotto
-    formData.append("productName", trimmedProductName);
-    formData.append("productDescription", newProduct.productDescription);
-    formData.append("productAmount", newProduct.productAmount);
-    formData.append("unitPrice", newProduct.unitPrice);
-    formData.append("isDiscount", newProduct.isDiscount);
-
+    formData.append("idCustomer", data.id);
+    formData.append("idDocumentType", data.documentType);
     // Aggiungi le immagini del prodotto
     photos.forEach((photo, index) => {
       formData.append(`photo${index + 1}`, photo.file);
@@ -670,13 +705,13 @@ function ManageDocument() {
 
     try {
       const response = await axios.post(
-        API_URL + "/Products/CreateProduct",
+        API_URL + "/Customer/LoadDocument",
         formData
       );
-      setIsAddingProduct(true);
+      setIsLoadingDocument(true);
       if (response.status === 201) {
         setTimeout(() => {
-          window.location.href = "/products";
+          location.reload();
         }, 1000);
       }
     } catch (error) {
@@ -715,6 +750,7 @@ function ManageDocument() {
     updatedPhotos.splice(index, 1);
     setPhotos(updatedPhotos);
   };
+
   return (
     <>
       <Snackbar
@@ -728,108 +764,146 @@ function ManageDocument() {
           {alertData.message}
         </Alert>
       </Snackbar>
+      {!imagesLoaded ? (
+        <>
+          <div className="mt-10 divide-y divide-gray-200">
+            <div className="space-y-1">
+              <h3 className="text-lg font-medium leading-6 text-gray-900">
+                Documenti
+              </h3>
+              <p className="max-w-2xl text-sm text-gray-500">
+                Inserisci una foto fronte retro del documento.
+              </p>
+            </div>
 
-      <div className="mt-10 divide-y divide-gray-200">
-        <div className="space-y-1">
-          <h3 className="text-lg font-medium leading-6 text-gray-900">
-            Documenti
-          </h3>
-          <p className="max-w-2xl text-sm text-gray-500">
-            Inserisci una foto fronte retro del documento.
+            <div className="mt-6">
+              <dl className="divide-y divide-gray-200">
+                <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
+                  <dt className="text-sm font-medium text-gray-500">
+                    Tipo di documento
+                  </dt>
+                  <dd className="mt-1 flex text-sm text-gray-900 sm:col-span-2 sm:mt-0 items-center">
+                    <span className="flex-grow">
+                      <Select
+                        label="Seleziona un tipo di documento"
+                        className="max-w-xs"
+                        size="sm"
+                        radius="sm"
+                        variant="bordered"
+                        value={data.documentType} // Imposta il valore del campo
+                        onChange={(e) =>
+                          setData({ ...data, documentType: e.target.value })
+                        } // Aggiorna lo stato quando viene selezionata una nuova opzione
+                      >
+                        <SelectItem key={1} value="Carta di identità">
+                          Carta di identità
+                        </SelectItem>
+                        <SelectItem key={2} value="Passaporto">
+                          Passaporto
+                        </SelectItem>
+                        <SelectItem key={3} value="Patente di guida">
+                          Patente di guida
+                        </SelectItem>
+                      </Select>
+                    </span>
+                  </dd>
+                  <label
+                    htmlFor="first-name"
+                    className="text-sm font-medium text-gray-500"
+                  >
+                    Foto del documento
+                  </label>
+                  <div className="flex flex-col gap-10">
+                    {data.documentType === "" && (
+                      <Alert variant="outlined" severity="warning">
+                        Dimensioni consigliate per l'immagine: <br /> 500x500
+                        pixel.
+                      </Alert>
+                    )}
+                    {photos.map((photo, index) => (
+                      <div
+                        key={index}
+                        className="flex flex-row gap-5 items-center"
+                      >
+                        <Image
+                          radius="sm"
+                          size="lg"
+                          width={200}
+                          height={200}
+                          src={
+                            photo.documentPath
+                              ? API_URL + "/Documents/" + photo.documentPath
+                              : URL.createObjectURL(photo.file)
+                          }
+                        />
+
+                        <Button
+                          isIconOnly
+                          className="bg-red-500 text-white"
+                          radius="sm"
+                          onClick={() => handleRemovePhoto(index)}
+                        >
+                          <DeleteRoundedIcon />{" "}
+                        </Button>
+                      </div>
+                    ))}
+
+                    {photos.length < 2 && (
+                      <label className="relative inline-flex justify-center items-center bg-primary text-white px-4 py-2 rounded-md cursor-pointer w-full">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleFileChange(e)}
+                          className="hidden"
+                          ref={fileInputRef}
+                        />
+                        <FileUploadRoundedIcon />
+                        {photos.length === 0 ? (
+                          <span>Carica fronte</span>
+                        ) : (
+                          <span>Carica retro {photos.length + "/" + 2}</span>
+                        )}
+                      </label>
+                    )}
+                  </div>
+                </div>
+              </dl>
+            </div>
+          </div>
+          <div className="mt-6 flex items-center justify-center lg:justify-end gap-x-6">
+            <Button
+              color="primary"
+              className="text-white"
+              radius="sm"
+              isDisabled={enableSubmit()}
+              onClick={handleSendDocument}
+              isLoading={isLoadingDocument}
+            >
+              {isLoadingDocument ? "Caricamento in corso" : "Carica documento"}
+            </Button>
+          </div>
+        </>
+      ) : (
+        <div className="flex items-center justify-center mt-6">
+          <svg
+            className="w-12 h-12 mr-4 text-green-500"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M5 13l4 4L19 7"
+            ></path>
+          </svg>
+          <p className="text-lg text-green-500 font-semibold">
+            Foto del documento inviate!
           </p>
         </div>
-        <div className="mt-6">
-          <dl className="divide-y divide-gray-200">
-            <div className="sm:grid sm:grid-cols-3 sm:items-start sm:gap-4 sm:py-6">
-              <dt className="text-sm font-medium text-gray-500">
-                Tipo di documento
-              </dt>
-              <dd className="mt-1 flex text-sm text-gray-900 sm:col-span-2 sm:mt-0 items-center">
-                <span className="flex-grow">
-                  <Select
-                    label="Seleziona un tipo di documento"
-                    className="max-w-xs"
-                    size="sm"
-                    radius="sm"
-                    variant="bordered"
-                  >
-                    <SelectItem key={1} value={1}>
-                      Carta di identità
-                    </SelectItem>
-                    <SelectItem key={2} value={2}>
-                      Passaporto
-                    </SelectItem>
-                    <SelectItem key={3} value={3}>
-                      Patente di guida
-                    </SelectItem>
-                  </Select>
-                </span>
-              </dd>
-              <label
-                htmlFor="first-name"
-                className="block text-sm font-medium leading-6 text-gray-900 sm:pt-1.5"
-              >
-                Foto del documento
-              </label>
-              <div className="flex flex-col gap-10">
-                <Alert variant="outlined" severity="warning">
-                  Dimensioni consigliate per l'immagine: <br /> 500x500 pixel.
-                </Alert>
-                {photos.map((photo, index) => (
-                  <div key={index} className="flex flex-row gap-5 items-center">
-                    <Image
-                      isBordered
-                      radius="sm"
-                      size="lg"
-                      width={200}
-                      height={200}
-                      src={URL.createObjectURL(photo.file)}
-                    />
-                    <Button
-                      isIconOnly
-                      className="bg-red-500 text-white"
-                      radius="sm"
-                      onClick={() => handleRemovePhoto(index)}
-                    >
-                      <DeleteRoundedIcon />{" "}
-                    </Button>
-                  </div>
-                ))}
-
-                {photos.length < 2 && (
-                  <label className="relative inline-flex justify-center items-center bg-primary text-white px-4 py-2 rounded-md cursor-pointer w-full">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => handleFileChange(e)}
-                      className="hidden"
-                      ref={fileInputRef}
-                    />
-                    <FileUploadRoundedIcon />
-                    {photos.length === 0 ? (
-                      <span>Carica fronte</span>
-                    ) : (
-                      <span>Carica retro {photos.length + "/" + 2}</span>
-                    )}
-                  </label>
-                )}
-              </div>
-            </div>
-          </dl>
-        </div>
-      </div>
-      <div className="mt-6 flex items-center justify-center lg:justify-end gap-x-6">
-        <Button
-          color="primary"
-          className="text-white"
-          radius="sm"
-          isDisabled={enableSubmit()}
-          onClick={handleAddProduct}
-          isLoading={isAddingProduct}
-        >
-          {isAddingProduct ? "Aggiornamento in corso" : "Salva modifiche"}
-        </Button>
-      </div>
+      )}
     </>
   );
 }
