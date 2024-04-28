@@ -7,10 +7,15 @@ import {
   ModalFooter,
   useDisclosure,
   Button,
+  user,
 } from "@nextui-org/react";
 import { RadioGroup, Radio } from "@nextui-org/react";
 import axios from "axios";
 import { API_URL } from "../../../API/API";
+import ModeEditOutlineRoundedIcon from "@mui/icons-material/ModeEditOutlineRounded";
+import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
+import { Chip } from "@nextui-org/react";
+import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -19,27 +24,175 @@ function classNames(...classes) {
 export default function Addresses() {
   const [addressList, setAddressList] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
-  const [selectedAddressIndex, setSelectedAddressIndex] = useState(null); // Add selected address index state
+  const [selectedAddressIndex, setSelectedAddressIndex] = useState(null);
+  const [selectedAddressForUpdate, setSelectedAddressForUpdate] =
+    useState(null);
   const [selected, setSelected] = useState(null);
-  const [userData, setUserData] = useState({});
+  const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
+  const [selectedAddressForEdit, setSelectedAddressForEdit] = useState(null);
+  const [userData, setUserData] = useState({
+    id: "",
+    name: "",
+    surname: "",
+    email: "",
+    password: "",
+  });
+
   useEffect(() => {
     axios
       .get(API_URL + "/Customer/GetCustomerData", { withCredentials: true })
       .then((res) => {
         if (res.status === 200 && res.data) {
           setUserData(res.data.customer);
+          fetchAddresses();
         }
       });
-  }, []);
+  }, [userData.id]);
+
+  const fetchAddresses = async () => {
+    try {
+      const res = await axios.get(API_URL + "/Customer/GetAllShippingInfo", {
+        params: { customerId: userData.id },
+      });
+
+      if (res.status === 200 && res.data) {
+        const addresses = res.data;
+        const updatedAddressList = await Promise.all(
+          addresses.map(async (address) => {
+            const isDefault = await isDefaultAddress(address);
+            return {
+              ...address,
+              isDefault: isDefault.result === 1,
+            };
+          })
+        );
+
+        setAddressList(updatedAddressList);
+      }
+    } catch (error) {
+      console.error("Error fetching addresses:", error);
+    }
+  };
+
+  const isDefaultAddress = async (address) => {
+    try {
+      const res = await axios.get(API_URL + "/Customer/isDefaultShipping", {
+        params: { idCustomer: userData.id, idShippingInfo: address.id },
+      });
+
+      if (res.status === 200) {
+        return res.data;
+      } else {
+        console.error(
+          "Failed to check if address is default. Status:",
+          res.status
+        );
+        return { result: 0 }; // Ritorna un valore predefinito nel caso di errore
+      }
+    } catch (error) {
+      console.error("Error checking if address is default:", error);
+      return { result: 0 }; // Ritorna un valore predefinito in caso di errore
+    }
+  };
+
+  const setDefaultAddress = (addressId) => {
+    axios
+      .put(API_URL + "/Customer/SetDefaultShipping", {
+        idShippingInfo: addressId,
+        idCustomer: userData.id,
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          fetchAddresses();
+          console.log("Default address set successfully");
+        } else {
+          console.error("Failed to set default address. Status:", res.status);
+        }
+      })
+      .catch((error) => {
+        console.error("Error setting default address:", error);
+      });
+  };
+
+  const addAddress = (addressId) => {
+    axios
+      .post(API_URL + "/Customer/AddShippingInfo", {
+        customerId: userData.id,
+        idShippingInfo: addressId,
+        name: newAddress.fullName,
+        address: newAddress.street,
+        civicNumber: newAddress.civicNumber,
+        cap: newAddress.postalCode,
+        city: newAddress.city,
+        province: newAddress.municipality,
+        nation: newAddress.nation,
+      })
+      .then((res) => {
+        if (res.status === 201) {
+          console.log("Address added successfully");
+          fetchAddresses();
+        } else {
+          console.error("Failed to add address. Status:", res.status);
+        }
+      })
+      .catch((error) => {
+        console.error("Error adding address:", error);
+      });
+  };
+
+  const updateAddress = (address) => {
+    axios
+      .put(API_URL + "/Customer/UpdateShippingInfo", {
+        idShippingDetail: address.id,
+        name: address.fullName,
+        address: address.street,
+        civicNumber: address.civicNumber,
+        cap: address.postalCode,
+        city: address.city,
+        province: address.municipality,
+        nation: address.nation,
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          console.log("Address updated successfully");
+          fetchAddresses();
+        } else {
+          console.error("Failed to update address. Status:", res.status);
+        }
+      })
+      .catch((error) => {
+        console.error("Error updating address:", error);
+      });
+  };
+
+  const deleteAddress = (addressId) => {
+    axios
+      .delete(API_URL + "/Customer/DeleteShippingInfo", {
+        params: { idCustomer: userData.id, idShippingInfo: addressId },
+      })
+      .then((res) => {
+        if (res.status === 200) {
+          console.log("Address deleted successfully");
+          fetchAddresses();
+        } else {
+          console.error("Failed to delete address. Status:", res.status);
+        }
+      })
+      .catch((error) => {
+        console.error("Error deleting address:", error);
+      });
+  };
 
   const [newAddress, setNewAddress] = useState({
+    id: "",
     fullName: "",
-    nation: "",
     city: "",
     municipality: "",
+    nation: "",
     postalCode: "",
     street: "",
     civicNumber: "",
+    isDefault: false,
   });
 
   const setNewAddressField = (field, value) => {
@@ -47,54 +200,81 @@ export default function Addresses() {
     setNewAddress(updatedAddress);
   };
 
-  const handleSelectAddress = (value, index) => {
-    setSelectedAddress(value);
-    setSelectedAddressIndex(index);
+  const handleSelectAddress = (addressId) => {
+    const updatedAddressList = addressList.map((address) => ({
+      ...address,
+      isDefault: address.id === addressId, // Imposta isDefault a true solo per l'indirizzo selezionato
+    }));
+    setAddressList(updatedAddressList);
+    setSelectedAddress(
+      updatedAddressList.find((address) => address.id === addressId)
+    );
+    setSelectedAddressIndex(addressId);
+    setDefaultAddress(addressId);
   };
 
   const handleAddAddress = () => {
-    const updatedAddressList = [...addressList, formatAddress(newAddress)];
-    setAddressList(updatedAddressList);
+    addAddress(newAddress);
   };
 
   const formatAddress = (address) => {
-    const { fullName, nation, municipality, postalCode, street, civicNumber } =
+    const { fullName, municipality, nation, postalCode, street, civicNumber } =
       address;
     return `${fullName}, ${municipality}, ${nation}, ${street} ${civicNumber}, ${postalCode}`;
   };
 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
 
-  const onOpenUpdate = (index) => {
-    setUpdateModalOpen(true);
-    setSelectedAddressIndex(index); // Imposta l'indice dell'indirizzo selezionato
-    setNewAddress(addressList[index]); // Imposta i valori dell'indirizzo selezionato
+  const resetNewAddress = () => {
+    setNewAddress({
+      id: "",
+      fullName: "",
+      city: "",
+      municipality: "",
+      nation: "",
+      postalCode: "",
+      street: "",
+      civicNumber: "",
+      isDefault: false,
+    });
+  };
+
+  const onOpenUpdate = (addressId) => {
+    return () => {
+      const address = addressList.find((address) => address.id === addressId);
+      setSelectedAddressForEdit(address);
+      setNewAddress({
+        id: address.id,
+        fullName: address.name,
+        city: address.city,
+        municipality: address.province,
+        nation: address.nation,
+        postalCode: address.cap,
+        street: address.address,
+        civicNumber: address.civicNumber,
+        isDefault: address.isDefault,
+      });
+      setUpdateModalOpen(true);
+    };
   };
 
   const onCloseUpdateModal = () => {
     setUpdateModalOpen(false);
+    setSelectedAddressForEdit(null);
+    resetNewAddress();
   };
 
   const onCloseModal = () => {
-    setNewAddress({
-      fullName: "",
-      nation: "",
-      city: "",
-      municipality: "",
-      postalCode: "",
-      street: "",
-      civicNumber: "",
-    });
+    resetNewAddress();
     onOpenChange();
   };
 
   function enableSubmit() {
     if (
       newAddress.fullName !== "" &&
-      newAddress.nation !== "" &&
       newAddress.city !== "" &&
       newAddress.municipality !== "" &&
+      newAddress.nation !== "" &&
       newAddress.postalCode !== "" &&
       newAddress.street !== "" &&
       newAddress.civicNumber !== ""
@@ -104,24 +284,6 @@ export default function Addresses() {
     return true;
   }
 
-  const handleModifyAddress = () => {
-    if (selectedAddressIndex !== null) {
-      const updatedAddressList = [...addressList];
-      const updatedAddress = formatAddress(newAddress);
-
-      if (
-        selectedAddressIndex >= 0 &&
-        selectedAddressIndex < updatedAddressList.length
-      ) {
-        updatedAddressList[selectedAddressIndex] = updatedAddress;
-        setAddressList(updatedAddressList);
-      }
-      onCloseUpdateModal();
-    } else {
-      console.error("selectedAddressIndex is null");
-    }
-  };
-
   return (
     <section className=" py-10 px-10 max-w-7xl mx-auto rounded-lg">
       <div className="py-12 sm:py-16">
@@ -130,22 +292,44 @@ export default function Addresses() {
             <h1 className="text-2xl font-bold">
               Seleziona un indirizzo tra quelli presenti o creane uno nuovo.
             </h1>
-            {addressList.length > 0 ? (
-              <RadioGroup
-                className="my-10"
-                color="primary"
-                value={selectedAddress}
-                onChange={handleSelectAddress}
-              >
-                {addressList.map((address, index) => (
-                  <Radio
-                    key={index}
-                    value={address}
-                    checked={address === selectedAddress}
-                    onChange={() => handleSelectAddress(address)}
-                  >
-                    <p className="text-sm text-gray-900">{address}</p>
-                  </Radio>
+            {addressList && addressList.length > 0 ? (
+              <RadioGroup className="my-10" color="primary">
+                {addressList.map((address) => (
+                  <div className="flex flex-row gap-5" key={address.id}>
+                    {address.isDefault && (
+                      <div className="my-auto">
+                        <Chip color="success">
+                          <div className="text-white">
+                            <CheckRoundedIcon /> Default
+                          </div>
+                        </Chip>
+                      </div>
+                    )}
+                    <Radio
+                      value={address.id}
+                      onClick={() => handleSelectAddress(address.id)}
+                      defaultChecked={address.isDefault}
+                    >
+                      <p className="text-sm text-gray-900">
+                        {address.name}, {address.address} {address.civicNumber},{" "}
+                        {address.cap}, {address.city}, {address.province},{" "}
+                        {address.nation}
+                      </p>
+                    </Radio>
+
+                    <Button radius="sm" onClick={onOpenUpdate(address.id)}>
+                      <ModeEditOutlineRoundedIcon />
+                    </Button>
+                    <Button
+                      radius="sm"
+                      color="danger"
+                      onClick={() => {
+                        deleteAddress(address.id);
+                      }}
+                    >
+                      <DeleteRoundedIcon />
+                    </Button>
+                  </div>
                 ))}
               </RadioGroup>
             ) : (
@@ -153,17 +337,8 @@ export default function Addresses() {
                 Nessun indirizzo presente
               </p>
             )}
-            {selectedAddress && (
-              <Button
-                color="primary"
-                className="mt-4 mx-5"
-                onClick={() => onOpenUpdate(selectedAddressIndex)}
-              >
-                Modifica indirizzo
-              </Button>
-            )}
 
-            <Button onPress={onOpen} color="primary">
+            <Button onPress={onOpen} color="primary" className="text-white">
               Aggiungi indirizzo
             </Button>
             <Modal
@@ -192,26 +367,6 @@ export default function Addresses() {
                           className="px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
                           onChange={(e) =>
                             setNewAddressField("fullName", e.target.value)
-                          }
-                        />
-                      </div>
-                    </div>
-
-                    <div>
-                      <label
-                        htmlFor="nation"
-                        className="block text-sm font-medium leading-6 text-gray-900"
-                      >
-                        Nazione
-                      </label>
-                      <div className="mt-2">
-                        <input
-                          type="text"
-                          name="nation"
-                          id="nation"
-                          className="px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                          onChange={(e) =>
-                            setNewAddressField("nation", e.target.value)
                           }
                         />
                       </div>
@@ -263,7 +418,7 @@ export default function Addresses() {
                         htmlFor="municipality"
                         className="block text-sm font-medium leading-6 text-gray-900"
                       >
-                        Comune
+                        Provincia
                       </label>
                       <div className="mt-2">
                         <input
@@ -274,6 +429,26 @@ export default function Addresses() {
                           value={newAddress.municipality}
                           onChange={(e) =>
                             setNewAddressField("municipality", e.target.value)
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <label
+                        htmlFor="nation"
+                        className="block text-sm font-medium leading-6 text-gray-900"
+                      >
+                        Nazione
+                      </label>
+                      <div className="mt-2">
+                        <input
+                          type="text"
+                          name="nation"
+                          id="nation"
+                          className="px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                          value={newAddress.nation}
+                          onChange={(e) =>
+                            setNewAddressField("nation", e.target.value)
                           }
                         />
                       </div>
@@ -374,27 +549,6 @@ export default function Addresses() {
                           />
                         </div>
                       </div>
-
-                      <div>
-                        <label
-                          htmlFor="nation"
-                          className="block text-sm font-medium leading-6 text-gray-900"
-                        >
-                          Nazione
-                        </label>
-                        <div className="mt-2">
-                          <input
-                            type="text"
-                            name="nation"
-                            id="nation"
-                            className="px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
-                            value={newAddress.nation}
-                            onChange={(e) =>
-                              setNewAddressField("nation", e.target.value)
-                            }
-                          />
-                        </div>
-                      </div>
                       <div className="flex flex-row gap-4">
                         <div className="w-1/3">
                           <label
@@ -457,6 +611,26 @@ export default function Addresses() {
                           />
                         </div>
                       </div>
+                      <div>
+                        <label
+                          htmlFor="nation"
+                          className="block text-sm font-medium leading-6 text-gray-900"
+                        >
+                          Nazione
+                        </label>
+                        <div className="mt-2">
+                          <input
+                            type="text"
+                            name="nation"
+                            id="nation"
+                            className="px-2 block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-primary sm:text-sm sm:leading-6"
+                            value={newAddress.nation}
+                            onChange={(e) =>
+                              setNewAddressField("nation", e.target.value)
+                            }
+                          />
+                        </div>
+                      </div>
                       <div className="flex flex-row gap-4">
                         <div className="w-full">
                           <label
@@ -514,7 +688,7 @@ export default function Addresses() {
                       <Button
                         color="primary"
                         isDisabled={enableSubmit()}
-                        onClick={handleModifyAddress}
+                        onClick={() => updateAddress(newAddress)}
                         onPress={onCloseUpdateModal}
                       >
                         Aggiorna
