@@ -21,6 +21,7 @@ import PrivacyPolicy from "./Pages/Documents/PrivacyPolicy";
 import PassRecover from "./Pages/PassRecover/PassRecover";
 import RecChangePassword from "./Pages/PassRecover/RecChangePassword";
 import RecoverSuccess from "./Pages/PassRecover/RecoverSuccess";
+import ProductDetail from "./Pages/Product/ProductDetail";
 
 export default function App() {
   const [isAuth, setIsAuth] = useState(false);
@@ -62,6 +63,10 @@ export default function App() {
         <Route
           element={<ProductPage />}
           path="/store/product/:id/:productName"
+        />
+        <Route
+          element={<ProductDetail />}
+          path="/store/product/:id/:productName/details"
         />
         <Route element={<About />} path="/about" />
         <Route element={<Login />} path="/login" />
