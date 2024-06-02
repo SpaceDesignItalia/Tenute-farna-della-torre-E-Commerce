@@ -283,7 +283,7 @@ export default function Registration() {
                   <div className="mt-2">
                     <Checkbox className="text-white" isRequired>
                       Accetto i{" "}
-                      <Link href="/termini-e-condizioni">
+                      <Link href="/terms-and-conditions">
                         Termini e Condizioni
                       </Link>{" "}
                       e la <Link href="/privacy-policy">Privacy Policy</Link>{" "}

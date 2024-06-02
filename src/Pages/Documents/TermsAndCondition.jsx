@@ -11,8 +11,11 @@ export default function TermsAndCondition() {
         <p className="mt-6 text-lg leading-8">
           Questi Termini e Condizioni d'Uso ("Termini") regolano l'accesso e
           l'utilizzo dei servizi offerti da TENUTE FARINA DELLA TORRE S.AGR.
-          S.R.L.S. ("Noi", "Il Nostro" o "Noi") tramite il sito web [URL del
-          Sito]. Accedendo o utilizzando il sito web, confermi di aver letto,
+          S.R.L.S. ("Noi", "Il Nostro" o "Noi") tramite il sito web{" "}
+          <a className="text-primary" href="https://tenutefarina.it">
+            tenutefarina.it/.com
+          </a>
+          . Accedendo o utilizzando il sito web, confermi di aver letto,
           compreso e accettato di essere vincolato da questi Termini. Se non
           accetti di essere vincolato da questi Termini, non utilizzare il
           nostro sito web o i nostri servizi.
@@ -99,7 +102,7 @@ export default function TermsAndCondition() {
             <h2 className="text-2xl font-bold text-gray-900">6. Contatti</h2>
             <p>
               6.1. Per qualsiasi domanda riguardante questi Termini, ti
-              preghiamo di contattarci all'indirizzo [inserire indirizzo email].
+              preghiamo di contattarci all'indirizzo info@tenutefarina.it.
             </p>
           </div>
           <p>

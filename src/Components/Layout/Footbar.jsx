@@ -12,8 +12,11 @@ export default function Footbar() {
       { name: "Assistenza", href: "#" },
       { name: "FAQ", href: "#" },
     ],
-    company: [{ name: "Azienda", href: "#" }],
-    legal: [{ name: "Privacy Policy", href: "#" }],
+    company: [{ name: "Azienda", href: "/about" }],
+    legal: [
+      { name: "Privacy Policy", href: "/privacy-policy" },
+      { name: "Termini e Condizioni", href: "/terms-and-conditions" },
+    ],
     social: [
       {
         name: "Facebook",

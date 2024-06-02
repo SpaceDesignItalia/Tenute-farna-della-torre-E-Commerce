@@ -5,6 +5,8 @@ import { API_URL } from "../../API/API";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { Image, Button, Accordion, AccordionItem } from "@nextui-org/react";
+import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
+import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -70,6 +72,10 @@ export default function ProductPage() {
         </div>
       );
     }
+  };
+
+  const handleRedirect = () => {
+    window.location.href = `${window.location.href}/details`;
   };
 
   return (
@@ -157,7 +163,15 @@ export default function ProductPage() {
                     isDisabled={!isAuth}
                     className="flex max-w-xs flex-1 items-center justify-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-50 sm:w-full"
                   >
+                    <ShoppingCartOutlinedIcon />
                     Aggiungi al carrello
+                  </Button>
+                  <Button
+                    onClick={handleRedirect}
+                    className="ml-5 flex max-w-xs flex-1 items-center justify-center rounded-md border-2 bg-white border-primary text-primary px-8 py-3 text-base font-medium hover:text-white hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-50 sm:w-full"
+                  >
+                    <ReceiptLongOutlinedIcon />
+                    Visualizza dettagli
                   </Button>
                 </div>
               </form>

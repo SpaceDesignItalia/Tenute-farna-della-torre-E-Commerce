@@ -22,6 +22,7 @@ import PassRecover from "./Pages/PassRecover/PassRecover";
 import RecChangePassword from "./Pages/PassRecover/RecChangePassword";
 import RecoverSuccess from "./Pages/PassRecover/RecoverSuccess";
 import ProductDetail from "./Pages/Product/ProductDetail";
+import CookieBanner from "./Components/Layout/CookieBanner";
 
 export default function App() {
   const [isAuth, setIsAuth] = useState(false);
@@ -57,9 +58,12 @@ export default function App() {
   return (
     <>
       <Navbar />
+      <CookieBanner />
       <Routes>
         <Route element={<Home />} path="/" />
         <Route element={<StorePage />} path="/store" />
+        <Route element={<PrivacyPolicy />} path="/privacy-policy" />
+        <Route element={<TermsAndCondition />} path="/terms-and-conditions" />
         <Route
           element={<ProductPage />}
           path="/store/product/:id/:productName"
