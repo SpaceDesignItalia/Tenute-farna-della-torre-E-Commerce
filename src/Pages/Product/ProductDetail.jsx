@@ -39,21 +39,25 @@ export default function ProductDetail() {
       className="flex justify-center items-center"
       style={{ overflow: "hidden", width: "100vw" }}
     >
-      <div style={{ width: "500px", position: "relative" }}>
-        <img
-          src={API_URL + "/uploads/" + productLabel}
-          alt="Product"
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-            ...zoomStyle,
-            transition: "transform 0.2s ease-in-out",
-          }}
-          onMouseMove={handleMouseMove}
-          onMouseLeave={handleMouseLeave}
-        />
-      </div>
+      {productLabel !== "" ? (
+        <div style={{ width: "500px", position: "relative" }}>
+          <img
+            src={API_URL + "/uploads/" + productLabel}
+            alt="Product"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              ...zoomStyle,
+              transition: "transform 0.2s ease-in-out",
+            }}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+          />
+        </div>
+      ) : (
+        <div className="h-full">Nessun dettaglio disponibile</div>
+      )}
     </div>
   );
 }

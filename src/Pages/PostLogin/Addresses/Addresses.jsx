@@ -62,7 +62,7 @@ export default function Addresses() {
             const isDefault = await isDefaultAddress(address);
             return {
               ...address,
-              isDefault: isDefault.result === 1,
+              isDefault: isDefault.result,
             };
           })
         );
@@ -308,7 +308,6 @@ export default function Addresses() {
                     <Radio
                       value={address.id}
                       onClick={() => handleSelectAddress(address.id)}
-                      defaultChecked={address.isDefault}
                     >
                       <p className="text-sm text-gray-900">
                         {address.name}, {address.address} {address.civicNumber},{" "}

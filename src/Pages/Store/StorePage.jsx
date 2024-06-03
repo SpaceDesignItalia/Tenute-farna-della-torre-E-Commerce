@@ -360,7 +360,7 @@ export default function StorePage() {
                       />
                     </div>
                     <div className="flex flex-1 flex-col space-y-2 p-4">
-                      <h3 className="text-sm font-medium text-gray-900">
+                      <h3 className="text-base font-semibold text-gray-900">
                         <a
                           href={
                             "/store/product/" +
@@ -377,7 +377,7 @@ export default function StorePage() {
                         </a>
                       </h3>
                       <div
-                        className="text-sm text-gray-500"
+                        className="text-sm text-gray-500 line-clamp-3"
                         dangerouslySetInnerHTML={{
                           __html: product.productDescription,
                         }}

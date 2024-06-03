@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { Disclosure, RadioGroup, Tab } from "@headlessui/react";
-import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { Tab } from "@headlessui/react";
 import { API_URL } from "../../API/API";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import { AnimatePresence, motion } from "framer-motion";
 import { Image, Button, Accordion, AccordionItem } from "@nextui-org/react";
 import ShoppingCartOutlinedIcon from "@mui/icons-material/ShoppingCartOutlined";
 import ReceiptLongOutlinedIcon from "@mui/icons-material/ReceiptLongOutlined";
+import { height } from "@mui/system";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -18,6 +19,7 @@ export default function ProductPage() {
   const [images, setImages] = useState([]);
   const [selectedOption, setSelectedOption] = useState(null); // Modifica per supportare più prodotti
   const { id, productName } = useParams();
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   useEffect(() => {
     axios
@@ -77,6 +79,34 @@ export default function ProductPage() {
   const handleRedirect = () => {
     window.location.href = `${window.location.href}/details`;
   };
+
+  const toggleDescription = () => {
+    setIsDescriptionExpanded(!isDescriptionExpanded);
+  };
+
+  function rowCounter(html) {
+    const [numRighe, setNumRighe] = useState(0);
+    useEffect(() => {
+      if (html) {
+        // Dividi l'HTML in righe
+        const righe = html.split("<p>");
+        // Conta il numero di righe
+        const num = righe.length;
+        setNumRighe(num);
+      }
+    }, [html]);
+
+    // Restituisci il numero di righe meno 1
+    return numRighe - 1;
+  }
+
+  function retardDescription(callback) {
+    let value = false;
+    setTimeout(() => {
+      value = true;
+      callback(value);
+    }, 20);
+  }
 
   return (
     <div className="bg-white">
@@ -145,16 +175,48 @@ export default function ProductPage() {
                   {calculateDiscountedPrice()}
                 </p>
               </div>
-
               <div className="mt-6">
                 <h3 className="sr-only">Descrizione</h3>
 
-                <div
-                  className="space-y-6 text-base text-gray-700"
-                  dangerouslySetInnerHTML={{
-                    __html: product.productDescription,
-                  }}
-                />
+                {rowCounter(product.productDescription) >= 6 ? (
+                  <motion.div
+                    className="space-y-6 text-base text-gray-700 overflow-hidden"
+                    initial={{
+                      height: isDescriptionExpanded && "auto",
+                    }}
+                    animate={{
+                      height: isDescriptionExpanded ? "auto" : "9rem",
+                    }}
+                    transition={{ duration: 0.5 }}
+                  >
+                    {product.productDescription && (
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: product.productDescription,
+                        }}
+                      />
+                    )}
+                  </motion.div>
+                ) : (
+                  <>
+                    {product.productDescription && (
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html: product.productDescription,
+                        }}
+                      />
+                    )}
+                  </>
+                )}
+
+                {rowCounter(product.productDescription) >= 6 && (
+                  <button
+                    onClick={toggleDescription}
+                    className="text-primary font-medium hover:underline"
+                  >
+                    {isDescriptionExpanded ? "Mostra meno" : "Visualizza tutto"}
+                  </button>
+                )}
               </div>
 
               <form className="mt-6">

@@ -50,7 +50,7 @@ export default function App() {
   if (isLoading) {
     return (
       <div className="absolute left-0 w-full h-full flex flex-col justify-center items-center">
-        <Spinner size="lg" color="danger" />
+        <Spinner size="lg" color="primary" />
       </div>
     );
   }
