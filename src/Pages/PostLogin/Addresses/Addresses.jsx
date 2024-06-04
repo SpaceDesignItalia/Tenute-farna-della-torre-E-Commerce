@@ -16,6 +16,7 @@ import ModeEditOutlineRoundedIcon from "@mui/icons-material/ModeEditOutlineRound
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
 import { Chip } from "@nextui-org/react";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
+import { CustomRadio } from "../../../Components/Layout/CustomRadio";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -25,9 +26,6 @@ export default function Addresses() {
   const [addressList, setAddressList] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(null);
-  const [selectedAddressForUpdate, setSelectedAddressForUpdate] =
-    useState(null);
-  const [selected, setSelected] = useState(null);
   const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
   const [selectedAddressForEdit, setSelectedAddressForEdit] = useState(null);
   const [userData, setUserData] = useState({
@@ -37,6 +35,7 @@ export default function Addresses() {
     email: "",
     password: "",
   });
+  const [defaultAddress, setDefAddress] = useState(null);
 
   useEffect(() => {
     axios
@@ -60,6 +59,9 @@ export default function Addresses() {
         const updatedAddressList = await Promise.all(
           addresses.map(async (address) => {
             const isDefault = await isDefaultAddress(address);
+            if (isDefault.result === 1) {
+              setDefAddress(address.id);
+            }
             return {
               ...address,
               isDefault: isDefault.result,
@@ -293,43 +295,58 @@ export default function Addresses() {
               Seleziona un indirizzo tra quelli presenti o creane uno nuovo.
             </h1>
             {addressList && addressList.length > 0 ? (
-              <RadioGroup className="my-10" color="primary">
-                {addressList.map((address) => (
-                  <div className="flex flex-row gap-5" key={address.id}>
-                    {address.isDefault && (
-                      <div className="my-auto">
-                        <Chip color="success">
-                          <div className="text-white">
-                            <CheckRoundedIcon /> Default
+              <RadioGroup
+                className="my-10"
+                color="primary"
+                defaultValue={defaultAddress}
+              >
+                <div className="lg:gap-5 lg:grid lg:grid-cols-3 sm:gap-3 sm:grid sm:grid-cols-2">
+                  {addressList.map((address) => (
+                    <div key={address.id}>
+                      <CustomRadio
+                        value={address.id}
+                        onClick={() => handleSelectAddress(address.id)}
+                      >
+                        {address.isDefault !== 0 && (
+                          <div className="text-primary flex flex-row">
+                            <CheckRoundedIcon />
+                            <p className="my-auto text-sm font-semibold px-1 italic">
+                              Predefinito
+                            </p>
                           </div>
-                        </Chip>
-                      </div>
-                    )}
-                    <Radio
-                      value={address.id}
-                      onClick={() => handleSelectAddress(address.id)}
-                    >
-                      <p className="text-sm text-gray-900">
-                        {address.name}, {address.address} {address.civicNumber},{" "}
-                        {address.cap}, {address.city}, {address.province},{" "}
-                        {address.nation}
-                      </p>
-                    </Radio>
-
-                    <Button radius="sm" onClick={onOpenUpdate(address.id)}>
-                      <ModeEditOutlineRoundedIcon />
-                    </Button>
-                    <Button
-                      radius="sm"
-                      color="danger"
-                      onClick={() => {
-                        deleteAddress(address.id);
-                      }}
-                    >
-                      <DeleteRoundedIcon />
-                    </Button>
-                  </div>
-                ))}
+                        )}
+                        <p className="text-sm font-semibold text-gray-900">
+                          {address.name}, {address.address}{" "}
+                          {address.civicNumber}, {address.cap}, {address.city},{" "}
+                          {address.province}, {address.nation}
+                        </p>
+                        <div className="flex flex-row gap-2 my-auto pt-2">
+                          <Button
+                            isIconOnly
+                            size="sm"
+                            radius="sm"
+                            color="primary"
+                            className="text-white"
+                            onClick={onOpenUpdate(address.id)}
+                          >
+                            <ModeEditOutlineRoundedIcon />
+                          </Button>
+                          <Button
+                            isIconOnly
+                            size="sm"
+                            radius="sm"
+                            color="danger"
+                            onClick={() => {
+                              deleteAddress(address.id);
+                            }}
+                          >
+                            <DeleteRoundedIcon />
+                          </Button>
+                        </div>
+                      </CustomRadio>
+                    </div>
+                  ))}
+                </div>
               </RadioGroup>
             ) : (
               <p className="my-10 text-sm text-gray-600">
@@ -337,13 +354,18 @@ export default function Addresses() {
               </p>
             )}
 
-            <Button onPress={onOpen} color="primary" className="text-white">
+            <Button
+              onPress={onOpen}
+              color="primary"
+              radius="sm"
+              className="text-white"
+            >
               Aggiungi indirizzo
             </Button>
             <Modal
               isOpen={isOpen}
               onOpenChange={onOpenChange}
-              placement="top-center"
+              placement="center"
             >
               <ModalContent>
                 <>
@@ -506,6 +528,7 @@ export default function Addresses() {
                     </Button>
                     <Button
                       color="primary"
+                      className="text-white"
                       isDisabled={enableSubmit()}
                       onClick={handleAddAddress}
                       onPress={() => onCloseModal()}
@@ -519,7 +542,7 @@ export default function Addresses() {
             <Modal
               isOpen={isUpdateModalOpen}
               onOpenChange={onCloseUpdateModal}
-              placement="top-center"
+              placement="center"
             >
               <ModalContent>
                 {(onCloseUpdateModal) => (
@@ -685,6 +708,7 @@ export default function Addresses() {
                         Annulla
                       </Button>
                       <Button
+                        className="text-white"
                         color="primary"
                         isDisabled={enableSubmit()}
                         onClick={() => updateAddress(newAddress)}

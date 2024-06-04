@@ -93,7 +93,7 @@ export default function Login() {
                   <div class="text-sm text-end mx-3 py-2">
                     <a
                       href="/recover/recover-account"
-                      class="font-semibold text-indigo-600 hover:text-indigo-500"
+                      class="font-semibold text-primary hover:text-black"
                     >
                       Password dimenticata?
                     </a>
