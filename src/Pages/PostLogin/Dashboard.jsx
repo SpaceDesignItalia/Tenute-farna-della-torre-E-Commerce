@@ -9,7 +9,7 @@ import { API_URL } from "../../API/API";
 const actions = [
   {
     title: "Storico ordini",
-    description: "Lorem ipsum dolor sit amet",
+    description: "Visualizza lo storico degli ordini associati al tuo account",
     href: "/dashboard/orders",
     icon: RestoreIcon,
     iconForeground: "text-teal-700",
@@ -17,7 +17,7 @@ const actions = [
   },
   {
     title: "Indirizzi",
-    description: "Lorem ipsum dolor sit amet",
+    description: "Gestisci gli indirizzi di spedizione del tuo account",
     href: "/dashboard/addresses",
     icon: HomeOutlinedIcon,
     iconForeground: "text-purple-700",
