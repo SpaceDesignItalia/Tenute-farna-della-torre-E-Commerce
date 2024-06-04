@@ -220,7 +220,7 @@ export default function ProductPage() {
               </div>
 
               <form className="mt-6">
-                <div className="mt-10 flex">
+                <div className="mt-10 flex flex-col sm:flex-row gap-5">
                   <Button
                     isDisabled={!isAuth}
                     className="flex max-w-xs flex-1 items-center justify-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-50 sm:w-full"
@@ -230,7 +230,7 @@ export default function ProductPage() {
                   </Button>
                   <Button
                     onClick={handleRedirect}
-                    className="ml-5 flex max-w-xs flex-1 items-center justify-center rounded-md border-2 bg-white border-primary text-primary px-8 py-3 text-base font-medium hover:text-white hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-50 sm:w-full"
+                    className="flex max-w-xs flex-1 items-center justify-center rounded-md border-2 bg-white border-primary text-primary px-8 py-3 text-base font-medium hover:text-white hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-50 sm:w-full"
                   >
                     <ReceiptLongOutlinedIcon />
                     Visualizza dettagli
