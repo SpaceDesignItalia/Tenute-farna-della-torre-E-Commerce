@@ -233,7 +233,7 @@ export default function ProductPage() {
                     className="flex max-w-xs flex-1 items-center justify-center rounded-md border-2 bg-white border-primary text-primary px-8 py-3 text-base font-medium hover:text-white hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-50 sm:w-full"
                   >
                     <ReceiptLongOutlinedIcon />
-                    Visualizza dettagli
+                    Valori nutrizionali
                   </Button>
                 </div>
               </form>

@@ -28,7 +28,7 @@ export default function ProductDetail() {
   }, [id, product]);
 
   return (
-    <div className="flex flex-col justify-center items-center py-5">
+    <div className="flex flex-col gap-5 justify-center items-center py-5">
       <div className="flex flex-col md:flex-row justify-start w-full gap-5">
         <Button
           startContent={<KeyboardBackspaceOutlinedIcon />}
