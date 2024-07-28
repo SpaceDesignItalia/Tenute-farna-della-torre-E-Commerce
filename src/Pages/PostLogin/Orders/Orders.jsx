@@ -34,7 +34,6 @@ export default function Orders() {
         amount,
         productName,
         productDescription,
-        productAmount,
         productImagePath,
         unitPrice,
       } = item;
@@ -51,7 +50,7 @@ export default function Orders() {
 
       ordersMap.get(idOrder).products.push({
         id: idProduct,
-        amount,
+        amount: amount,
         name: productName,
         description: productDescription,
         imageSrc: API_URL + "/uploads/" + productImagePath,
@@ -197,6 +196,7 @@ export default function Orders() {
                               <div className="ml-6 flex-1 text-sm">
                                 <div className="font-medium text-gray-900 sm:flex sm:justify-between">
                                   <h5>{product.name}</h5>
+                                  <h5>{product.amount} pezzi</h5>
                                   <p className="mt-2 sm:mt-0">
                                     €{product.price}
                                   </p>
