@@ -25,6 +25,9 @@ export default function ShoppingCart() {
   ];
   const [products, setProducts] = React.useState([]);
   const [update, setUpdate] = React.useState(false);
+  const [subtotal, setSubtotal] = React.useState(0);
+  const shippingCost = 5.0;
+  const [VAT, setVAT] = React.useState(0);
 
   useEffect(() => {
     axios
@@ -36,6 +39,15 @@ export default function ShoppingCart() {
         console.log(error);
       });
   }, [update]);
+
+  useEffect(() => {
+    let subtotal = 0;
+    products.map((product) => {
+      subtotal += product.unitPrice * product.amount;
+    });
+    setSubtotal(subtotal);
+    setVAT(subtotal * 0.22);
+  }, [products]);
 
   const handleIncreaseAmount = (idProduct) => {
     axios
@@ -74,6 +86,17 @@ export default function ShoppingCart() {
         { idProduct: idProduct },
         { withCredentials: true }
       )
+      .then((response) => {
+        setUpdate(!update);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handlecompleteOrder = () => {
+    axios
+      .post(API_URL + "/Cart/CompleteOrder", {}, { withCredentials: true })
       .then((response) => {
         setUpdate(!update);
       })
@@ -127,6 +150,10 @@ export default function ShoppingCart() {
                           </h3>
                         </div>
                         <p>{product.unitPrice} €</p>
+                        <h4 className="mt-1 text-sm font-medium text-gray-900">
+                          Totale prodotto:{" "}
+                        </h4>
+                        <p>{product.unitPrice * product.amount} €</p>
                       </div>
 
                       <div className="mt-4 sm:mt-0 sm:pr-9">
@@ -210,25 +237,31 @@ export default function ShoppingCart() {
             <dl className="mt-6 space-y-4">
               <div className="flex items-center justify-between">
                 <dt className="text-sm text-gray-600">Subtotale</dt>
-                <dd className="text-sm font-medium text-gray-900">€99.00</dd>
+                <dd className="text-sm font-medium text-gray-900">
+                  {subtotal} €
+                </dd>
               </div>
               <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                 <dt className="flex items-center text-sm text-gray-600">
                   <span>Spese di spedizione</span>
                 </dt>
-                <dd className="text-sm font-medium text-gray-900">€5.00</dd>
+                <dd className="text-sm font-medium text-gray-900">
+                  {shippingCost} €
+                </dd>
               </div>
               <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                 <dt className="flex text-sm text-gray-600">
                   <span>IVA</span>
                 </dt>
-                <dd className="text-sm font-medium text-gray-900">€8.32</dd>
+                <dd className="text-sm font-medium text-gray-900">{VAT} €</dd>
               </div>
               <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                 <dt className="text-base font-medium text-gray-900">
                   Totale ordine
                 </dt>
-                <dd className="text-base font-medium text-gray-900">€112.32</dd>
+                <dd className="text-base font-medium text-gray-900">
+                  {subtotal + VAT + shippingCost} €
+                </dd>
               </div>
             </dl>
 
@@ -236,6 +269,9 @@ export default function ShoppingCart() {
               <button
                 type="submit"
                 className="w-full rounded-md border border-transparent bg-primary px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50"
+                onClick={() => {
+                  handlecompleteOrder();
+                }}
               >
                 Completa ordine
               </button>
