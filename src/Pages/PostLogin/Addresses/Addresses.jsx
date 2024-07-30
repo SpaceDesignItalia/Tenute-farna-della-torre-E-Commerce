@@ -9,12 +9,11 @@ import {
   Button,
   user,
 } from "@nextui-org/react";
-import { RadioGroup, Radio } from "@nextui-org/react";
+import { RadioGroup } from "@nextui-org/react";
 import axios from "axios";
 import { API_URL } from "../../../API/API";
 import ModeEditOutlineRoundedIcon from "@mui/icons-material/ModeEditOutlineRounded";
 import DeleteRoundedIcon from "@mui/icons-material/DeleteRounded";
-import { Chip } from "@nextui-org/react";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 import { CustomRadio } from "../../../Components/Layout/CustomRadio";
 
