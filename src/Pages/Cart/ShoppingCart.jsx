@@ -5,7 +5,13 @@ import {
   QuestionMarkCircleIcon,
   XMarkIcon,
 } from "@heroicons/react/20/solid";
-import { Select, SelectSection, SelectItem } from "@nextui-org/react";
+import {
+  Select,
+  SelectSection,
+  SelectItem,
+  Button,
+  Link,
+} from "@nextui-org/react";
 
 export default function ShoppingCart() {
   const quantity = [
@@ -236,12 +242,13 @@ export default function ShoppingCart() {
             </dl>
 
             <div className="mt-6">
-              <button
-                type="submit"
-                className="w-full rounded-md border border-transparent bg-primary px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50"
+              <Button
+                as={Link}
+                href="/checkout"
+                className="w-full rounded-md border border-transparent bg-primary px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-50"
               >
                 Completa ordine
-              </button>
+              </Button>
             </div>
           </section>
         </form>

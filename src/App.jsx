@@ -23,6 +23,8 @@ import RecChangePassword from "./Pages/PassRecover/RecChangePassword";
 import RecoverSuccess from "./Pages/PassRecover/RecoverSuccess";
 import ProductDetail from "./Pages/Product/ProductDetail";
 import CookieBanner from "./Components/Layout/CookieBanner";
+import Checkout from "./Pages/Checkout/Checkout";
+import EndOrder from "./Pages/Checkout/EndOrder";
 
 export default function App() {
   const [isAuth, setIsAuth] = useState(false);
@@ -100,6 +102,8 @@ const ProtectedRoutes = ({ isAuth }) => {
     "/editAddress",
     "/addAddress",
     "/cart",
+    "/checkout",
+    "/order-confirmed",
   ];
 
   // Verifichiamo se l'utente sta tentando di accedere a un percorso protetto
@@ -120,6 +124,8 @@ const ProtectedRoutes = ({ isAuth }) => {
         <Route element={<Orders />} path="/dashboard/orders" />
         <Route element={<Addresses />} path="/dashboard/addresses" />
         <Route element={<ShoppingCart />} path="/cart" />
+        <Route element={<Checkout />} path="/checkout" />
+        <Route element={<EndOrder />} path="/order-confirmed" />
       </Route>
     </Routes>
   );
