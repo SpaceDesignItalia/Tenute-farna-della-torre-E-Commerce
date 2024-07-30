@@ -37,7 +37,6 @@ export default function ProductPage() {
       )
       .then((res) => {
         setProduct(res.data[0]);
-        console.log(res.data);
       });
     axios.get(API_URL + "/Products/GetProductImagesById/" + id).then((res) => {
       setImages(res.data);
@@ -106,6 +105,20 @@ export default function ProductPage() {
       value = true;
       callback(value);
     }, 20);
+  }
+
+  function handleAddToCart() {
+    axios
+      .post(
+        API_URL + "/Cart/AddToCart",
+        { idProduct: product.idProduct },
+        { withCredentials: true }
+      )
+      .then((res) => {
+        if (res.status === 200) {
+          alert("Prodotto aggiunto al carrello");
+        }
+      });
   }
 
   return (
@@ -222,6 +235,9 @@ export default function ProductPage() {
               <form className="mt-6">
                 <div className="mt-10 flex flex-col sm:flex-row gap-5">
                   <Button
+                    onClick={() => {
+                      handleAddToCart();
+                    }}
                     isDisabled={!isAuth}
                     className="flex max-w-xs flex-1 items-center justify-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-50 sm:w-full"
                   >

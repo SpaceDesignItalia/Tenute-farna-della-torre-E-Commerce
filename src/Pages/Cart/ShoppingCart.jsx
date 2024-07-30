@@ -1,11 +1,16 @@
 import React from "react";
+import { useEffect } from "react";
 import {
   CheckIcon,
   ClockIcon,
   QuestionMarkCircleIcon,
   XMarkIcon,
 } from "@heroicons/react/20/solid";
-import { Select, SelectSection, SelectItem } from "@nextui-org/react";
+import { Select, SelectSection, SelectItem, Button } from "@nextui-org/react";
+import axios from "axios";
+import { API_URL } from "../../API/API";
+import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
+import AddRoundedIcon from "@mui/icons-material/AddRounded";
 
 export default function ShoppingCart() {
   const quantity = [
@@ -18,48 +23,88 @@ export default function ShoppingCart() {
     { value: "7", label: "7" },
     { value: "8", label: "8" },
   ];
-  const products = [
-    {
-      id: 1,
-      name: "Basic Tee",
-      href: "#",
-      price: 32.0,
-      discountValue: 10,
-      discountType: 1,
-      color: "Sienna",
-      inStock: true,
-      size: "Large",
-      imageSrc:
-        "https://tailwindui.com/img/ecommerce-images/shopping-cart-page-01-product-01.jpg",
-      imageAlt: "Front of men's Basic Tee in sienna.",
-    },
-    {
-      id: 2,
-      name: "Basic Tee",
-      href: "#",
-      price: 32.0,
-      discountValue: 20,
-      discountType: 2,
-      color: "Black",
-      inStock: false,
-      leadTime: "3–4 weeks",
-      size: "Large",
-      imageSrc:
-        "https://tailwindui.com/img/ecommerce-images/shopping-cart-page-01-product-02.jpg",
-      imageAlt: "Front of men's Basic Tee in black.",
-    },
-    {
-      id: 3,
-      name: "Nomad Tumbler",
-      href: "#",
-      price: 35,
-      color: "White",
-      inStock: true,
-      imageSrc:
-        "https://tailwindui.com/img/ecommerce-images/shopping-cart-page-01-product-03.jpg",
-      imageAlt: "Insulated bottle with white base and black snap lid.",
-    },
-  ];
+  const [products, setProducts] = React.useState([]);
+  const [update, setUpdate] = React.useState(false);
+  const [subtotal, setSubtotal] = React.useState(0);
+  const shippingCost = 5.0;
+  const [VAT, setVAT] = React.useState(0);
+
+  useEffect(() => {
+    axios
+      .get(API_URL + "/Cart/GetProductsByIdCustomer", { withCredentials: true })
+      .then((response) => {
+        setProducts(response.data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }, [update]);
+
+  useEffect(() => {
+    let subtotal = 0;
+    products.map((product) => {
+      subtotal += product.unitPrice * product.amount;
+    });
+    setSubtotal(subtotal);
+    setVAT(subtotal * 0.22);
+  }, [products]);
+
+  const handleIncreaseAmount = (idProduct) => {
+    axios
+      .post(
+        API_URL + "/Cart/IncreaseAmount",
+        { idProduct: idProduct },
+        { withCredentials: true }
+      )
+      .then((response) => {
+        setUpdate(!update);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handleDecreaseAmount = (idProduct) => {
+    axios
+      .post(
+        API_URL + "/Cart/DecreaseAmount",
+        { idProduct: idProduct },
+        { withCredentials: true }
+      )
+      .then((response) => {
+        setUpdate(!update);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handleRemoveProduct = (idProduct) => {
+    axios
+      .post(
+        API_URL + "/Cart/RemoveProduct",
+        { idProduct: idProduct },
+        { withCredentials: true }
+      )
+      .then((response) => {
+        setUpdate(!update);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
+  const handlecompleteOrder = () => {
+    axios
+      .post(API_URL + "/Cart/CompleteOrder", {}, { withCredentials: true })
+      .then((response) => {
+        setUpdate(!update);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  };
+
   return (
     <div className="bg-white">
       <div className="mx-auto max-w-2xl px-4 pb-24 pt-16 sm:px-6 lg:max-w-7xl lg:px-8">
@@ -82,11 +127,11 @@ export default function ShoppingCart() {
             >
               {products.length === 0 && <span>il carrello è vuoto</span>}
               {products.map((product, productIdx) => (
-                <li key={product.id} className="flex py-6 sm:py-10">
+                <li key={product.idProduct} className="flex py-6 sm:py-10">
                   <div className="flex-shrink-0">
                     <img
-                      src={product.imageSrc}
-                      alt={product.imageAlt}
+                      src={API_URL + "/uploads/" + product.productImagePath}
+                      alt={product.productName}
                       className="h-24 w-24 rounded-md object-cover object-center sm:h-48 sm:w-48"
                     />
                   </div>
@@ -97,76 +142,55 @@ export default function ShoppingCart() {
                         <div className="flex justify-between">
                           <h3 className="text-sm">
                             <a
-                              href={product.href}
+                              href={product.productName}
                               className="font-medium text-gray-700 hover:text-gray-800"
                             >
-                              {product.name}
+                              {product.productName}
                             </a>
                           </h3>
                         </div>
-                        <div className="mt-1 flex text-sm">
-                          <p className="text-gray-500">{product.color}</p>
-                          {product.size ? (
-                            <p className="ml-4 border-l border-gray-200 pl-4 text-gray-500">
-                              {product.size}
-                            </p>
-                          ) : null}
-                        </div>
-                        <p
-                          className={
-                            product.discountType < 1
-                              ? "mt-1 text-sm font-medium text-gray-900"
-                              : "mt-1 text-sm font-medium text-gray-900 line-through"
-                          }
-                        >
-                          € {product.price.toFixed(2)}
-                        </p>
-                        <p className="mt-1 text-sm font-medium text-gray-900">
-                          {product.discountType > 1 && (
-                            <span className="text-gray-900">€ </span>
-                          )}
-                          {product.discountType === 1 &&
-                            product.price.toFixed(2) -
-                              (product.price.toFixed(2) *
-                                product.discountValue) /
-                                100}
-                          {product.discountType === 2 &&
-                            (
-                              product.price.toFixed(2) -
-                              product.discountValue.toFixed(2)
-                            ).toFixed(2)}
-                        </p>
+                        <p>{product.unitPrice} €</p>
+                        <h4 className="mt-1 text-sm font-medium text-gray-900">
+                          Totale prodotto:{" "}
+                        </h4>
+                        <p>{product.unitPrice * product.amount} €</p>
                       </div>
 
                       <div className="mt-4 sm:mt-0 sm:pr-9">
-                        <label
-                          htmlFor={`quantity-${productIdx}`}
-                          className="sr-only"
-                        >
-                          Quantity, {product.name}
+                        <label htmlFor={`quantity-${productIdx}`}>
+                          Quantity: {product.amount}
                         </label>
 
-                        <Select
+                        <Button
+                          isIconOnly
                           size="sm"
-                          variant="bordered"
-                          defaultSelectedKeys="1"
+                          color="warning"
+                          onClick={() =>
+                            handleDecreaseAmount(product.idProduct)
+                          }
                         >
-                          {quantity.map((quantity) => (
-                            <SelectItem
-                              key={quantity.value}
-                              value={quantity.value}
-                            >
-                              {quantity.label}
-                            </SelectItem>
-                          ))}
-                        </Select>
+                          <RemoveRoundedIcon />
+                        </Button>
+                        <Button
+                          isIconOnly
+                          size="sm"
+                          color="success"
+                          onClick={() =>
+                            handleIncreaseAmount(product.idProduct)
+                          }
+                        >
+                          <AddRoundedIcon />
+                        </Button>
 
                         <div className="absolute right-0 top-0">
                           <button
                             type="button"
                             className="-m-2 inline-flex p-2 text-gray-400 hover:text-gray-500"
+                            onClick={() => {
+                              handleRemoveProduct(product.idProduct);
+                            }}
+                            isIconOnly
                           >
-                            <span className="sr-only">Remove</span>
                             <XMarkIcon className="h-5 w-5" aria-hidden="true" />
                           </button>
                         </div>
@@ -213,25 +237,31 @@ export default function ShoppingCart() {
             <dl className="mt-6 space-y-4">
               <div className="flex items-center justify-between">
                 <dt className="text-sm text-gray-600">Subtotale</dt>
-                <dd className="text-sm font-medium text-gray-900">€99.00</dd>
+                <dd className="text-sm font-medium text-gray-900">
+                  {subtotal} €
+                </dd>
               </div>
               <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                 <dt className="flex items-center text-sm text-gray-600">
                   <span>Spese di spedizione</span>
                 </dt>
-                <dd className="text-sm font-medium text-gray-900">€5.00</dd>
+                <dd className="text-sm font-medium text-gray-900">
+                  {shippingCost} €
+                </dd>
               </div>
               <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                 <dt className="flex text-sm text-gray-600">
                   <span>IVA</span>
                 </dt>
-                <dd className="text-sm font-medium text-gray-900">€8.32</dd>
+                <dd className="text-sm font-medium text-gray-900">{VAT} €</dd>
               </div>
               <div className="flex items-center justify-between border-t border-gray-200 pt-4">
                 <dt className="text-base font-medium text-gray-900">
                   Totale ordine
                 </dt>
-                <dd className="text-base font-medium text-gray-900">€112.32</dd>
+                <dd className="text-base font-medium text-gray-900">
+                  {subtotal + VAT + shippingCost} €
+                </dd>
               </div>
             </dl>
 
@@ -239,6 +269,9 @@ export default function ShoppingCart() {
               <button
                 type="submit"
                 className="w-full rounded-md border border-transparent bg-primary px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50"
+                onClick={() => {
+                  handlecompleteOrder();
+                }}
               >
                 Completa ordine
               </button>
