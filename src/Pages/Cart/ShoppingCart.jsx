@@ -1,16 +1,8 @@
-import React from "react";
-import { useEffect } from "react";
-import {
-  CheckIcon,
-  ClockIcon,
-  QuestionMarkCircleIcon,
-  XMarkIcon,
-} from "@heroicons/react/20/solid";
-import { Select, SelectSection, SelectItem, Button } from "@nextui-org/react";
+import React, { useState, useEffect } from "react";
+import { CheckIcon, ClockIcon, XMarkIcon } from "@heroicons/react/20/solid";
+import { Select, SelectItem, Button, Link } from "@nextui-org/react";
 import axios from "axios";
 import { API_URL } from "../../API/API";
-import RemoveRoundedIcon from "@mui/icons-material/RemoveRounded";
-import AddRoundedIcon from "@mui/icons-material/AddRounded";
 
 export default function ShoppingCart() {
   const quantity = [
@@ -23,17 +15,28 @@ export default function ShoppingCart() {
     { value: "7", label: "7" },
     { value: "8", label: "8" },
   ];
-  const [products, setProducts] = React.useState([]);
-  const [update, setUpdate] = React.useState(false);
-  const [subtotal, setSubtotal] = React.useState(0);
+
+  const [products, setProducts] = useState([]);
+  const [update, setUpdate] = useState(false);
+  const [subtotal, setSubtotal] = useState(0);
   const shippingCost = 5.0;
-  const [VAT, setVAT] = React.useState(0);
+  const [VAT, setVAT] = useState(0);
+  const [disabledOptions, setDisabledOptions] = useState({});
 
   useEffect(() => {
     axios
       .get(API_URL + "/Cart/GetProductsByIdCustomer", { withCredentials: true })
       .then((response) => {
         setProducts(response.data);
+        const newDisabledOptions = {};
+
+        response.data.forEach((product) => {
+          newDisabledOptions[product.idProduct] = quantity
+            .filter((q) => parseInt(q.value) > product.productAmount)
+            .map((q) => q.value);
+        });
+
+        setDisabledOptions(newDisabledOptions);
       })
       .catch((error) => {
         console.log(error);
@@ -49,34 +52,40 @@ export default function ShoppingCart() {
     setVAT(subtotal * 0.22);
   }, [products]);
 
-  const handleIncreaseAmount = (idProduct) => {
-    axios
-      .post(
-        API_URL + "/Cart/IncreaseAmount",
-        { idProduct: idProduct },
-        { withCredentials: true }
-      )
-      .then((response) => {
-        setUpdate(!update);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const handleDecreaseAmount = (idProduct) => {
-    axios
-      .post(
-        API_URL + "/Cart/DecreaseAmount",
-        { idProduct: idProduct },
-        { withCredentials: true }
-      )
-      .then((response) => {
-        setUpdate(!update);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+  const handleUpdateAmount = (idProduct, amount) => {
+    if (isNaN(amount)) {
+      axios
+        .post(
+          API_URL + "/Cart/UpdateAmount",
+          { idProduct: idProduct, amount: 1 },
+          { withCredentials: true }
+        )
+        .then((response) => {
+          if (response.status === 200) {
+            setUpdate(!update); // Trigger re-fetch of products
+            window.location.reload();
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    } else {
+      axios
+        .post(
+          API_URL + "/Cart/UpdateAmount",
+          { idProduct: idProduct, amount: amount },
+          { withCredentials: true }
+        )
+        .then((response) => {
+          if (response.status === 200) {
+            setUpdate(!update); // Trigger re-fetch of products
+            window.location.reload();
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+    }
   };
 
   const handleRemoveProduct = (idProduct) => {
@@ -87,18 +96,7 @@ export default function ShoppingCart() {
         { withCredentials: true }
       )
       .then((response) => {
-        setUpdate(!update);
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  };
-
-  const handlecompleteOrder = () => {
-    axios
-      .post(API_URL + "/Cart/CompleteOrder", {}, { withCredentials: true })
-      .then((response) => {
-        setUpdate(!update);
+        setUpdate(!update); // Trigger re-fetch of products
       })
       .catch((error) => {
         console.log(error);
@@ -125,7 +123,7 @@ export default function ShoppingCart() {
                   : "divide-y divide-gray-200 border-b border-t border-gray-200"
               }
             >
-              {products.length === 0 && <span>il carrello è vuoto</span>}
+              {products.length === 0 && <span>Il carrello è vuoto</span>}
               {products.map((product, productIdx) => (
                 <li key={product.idProduct} className="flex py-6 sm:py-10">
                   <div className="flex-shrink-0">
@@ -156,31 +154,40 @@ export default function ShoppingCart() {
                         <p>{product.unitPrice * product.amount} €</p>
                       </div>
 
-                      <div className="mt-4 sm:mt-0 sm:pr-9">
+                      <div className="flex items-center gap-3 mt-4 sm:mt-0 sm:pr-9">
                         <label htmlFor={`quantity-${productIdx}`}>
-                          Quantity: {product.amount}
+                          Quantity:
                         </label>
-
-                        <Button
-                          isIconOnly
-                          size="sm"
-                          color="warning"
-                          onClick={() =>
-                            handleDecreaseAmount(product.idProduct)
+                        <Select
+                          radius="sm"
+                          variant="bordered"
+                          value={product.amount.toString()}
+                          defaultSelectedKeys={[product.amount.toString()]}
+                          onChange={(e) =>
+                            handleUpdateAmount(
+                              product.idProduct,
+                              parseInt(e.target.value)
+                            )
                           }
+                          className="mt-1 block w-20"
                         >
-                          <RemoveRoundedIcon />
-                        </Button>
-                        <Button
-                          isIconOnly
-                          size="sm"
-                          color="success"
-                          onClick={() =>
-                            handleIncreaseAmount(product.idProduct)
-                          }
-                        >
-                          <AddRoundedIcon />
-                        </Button>
+                          {quantity.map((q) => {
+                            const value = q.value;
+                            const isDisabled =
+                              disabledOptions[product.idProduct]?.includes(
+                                value
+                              );
+                            return (
+                              <SelectItem
+                                key={value}
+                                value={value}
+                                isDisabled={isDisabled}
+                              >
+                                {q.label}
+                              </SelectItem>
+                            );
+                          })}
+                        </Select>
 
                         <div className="absolute right-0 top-0">
                           <button
@@ -189,7 +196,6 @@ export default function ShoppingCart() {
                             onClick={() => {
                               handleRemoveProduct(product.idProduct);
                             }}
-                            isIconOnly
                           >
                             <XMarkIcon className="h-5 w-5" aria-hidden="true" />
                           </button>
@@ -198,7 +204,7 @@ export default function ShoppingCart() {
                     </div>
 
                     <p className="mt-4 flex space-x-2 text-sm text-gray-700">
-                      {product.inStock ? (
+                      {product.productAmount > 0 ? (
                         <CheckIcon
                           className="h-5 w-5 flex-shrink-0 text-green-500"
                           aria-hidden="true"
@@ -211,9 +217,9 @@ export default function ShoppingCart() {
                       )}
 
                       <span>
-                        {product.inStock
+                        {product.productAmount > 0
                           ? "In stock"
-                          : `Ships in ${product.leadTime}`}
+                          : `Non disponibile`}
                       </span>
                     </p>
                   </div>
@@ -242,40 +248,30 @@ export default function ShoppingCart() {
                 </dd>
               </div>
               <div className="flex items-center justify-between border-t border-gray-200 pt-4">
-                <dt className="flex items-center text-sm text-gray-600">
-                  <span>Spese di spedizione</span>
-                </dt>
+                <dt className="text-sm text-gray-600">Spese di spedizione</dt>
                 <dd className="text-sm font-medium text-gray-900">
                   {shippingCost} €
                 </dd>
               </div>
               <div className="flex items-center justify-between border-t border-gray-200 pt-4">
-                <dt className="flex text-sm text-gray-600">
-                  <span>IVA</span>
-                </dt>
-                <dd className="text-sm font-medium text-gray-900">{VAT} €</dd>
-              </div>
-              <div className="flex items-center justify-between border-t border-gray-200 pt-4">
-                <dt className="text-base font-medium text-gray-900">
-                  Totale ordine
-                </dt>
-                <dd className="text-base font-medium text-gray-900">
-                  {subtotal + VAT + shippingCost} €
+                <dt className="text-sm text-gray-600">IVA (22%)</dt>
+                <dd className="text-sm font-medium text-gray-900">
+                  {VAT.toFixed(2)} €
                 </dd>
               </div>
-            </dl>
-
-            <div className="mt-6">
-              <button
-                type="submit"
+              <div className="flex items-center justify-between border-t border-gray-200 pt-4 text-base font-medium text-gray-900">
+                <dt>Totale</dt>
+                <dd>{(subtotal + shippingCost + VAT).toFixed(2)} €</dd>
+              </div>
+              <Button
+                as={Link}
                 className="w-full rounded-md border border-transparent bg-primary px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 focus:ring-offset-gray-50"
-                onClick={() => {
-                  handlecompleteOrder();
-                }}
+                href="/checkout"
+                isDisabled={products.length === 0}
               >
                 Completa ordine
               </Button>
-            </div>
+            </dl>
           </section>
         </form>
       </div>

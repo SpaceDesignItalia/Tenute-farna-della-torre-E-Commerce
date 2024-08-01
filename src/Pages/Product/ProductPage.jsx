@@ -116,7 +116,7 @@ export default function ProductPage() {
       )
       .then((res) => {
         if (res.status === 200) {
-          alert("Prodotto aggiunto al carrello");
+          location.reload();
         }
       });
   }
@@ -238,11 +238,18 @@ export default function ProductPage() {
                     onClick={() => {
                       handleAddToCart();
                     }}
-                    isDisabled={!isAuth}
+                    isDisabled={!isAuth || product.productAmount == 0}
                     className="flex max-w-xs flex-1 items-center justify-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-50 sm:w-full"
                   >
-                    <ShoppingCartOutlinedIcon />
-                    Aggiungi al carrello
+                    {product.productAmount == 0 ? (
+                      "Non disponibile"
+                    ) : (
+                      <>
+                        {" "}
+                        <ShoppingCartOutlinedIcon />
+                        Aggiungi al carrello
+                      </>
+                    )}
                   </Button>
                   <Button
                     onClick={handleRedirect}
@@ -259,7 +266,7 @@ export default function ProductPage() {
                   Additional details
                 </h2>
 
-                <div className="divide-y divide-gray-200 border-t">
+                {/* <div className="divide-y divide-gray-200 border-t">
                   <Accordion>
                     <AccordionItem
                       key="1"
@@ -276,7 +283,7 @@ export default function ProductPage() {
                       Test 2
                     </AccordionItem>
                   </Accordion>
-                </div>
+                </div> */}
               </section>
             </div>
           </div>

@@ -9,7 +9,7 @@ export default function OurStrengths() {
           <div class="flex flex-wrap md:my-10">
             <div class="w-full px-4 mb-10 lg:mb-0 ">
               <h2 class="text-center pb-4 text-4xl font-bold text-gray-800 ">
-                Vini Siciliani, Territorio, Arte Sensoriale
+                Vini siciliani, Territorio, Arte sensoriale
               </h2>
               <p class="text-center mb-10 text-base leading-7 text-gray-500">
                 L'azienda situata in una zona viticola privilegiata del comune

@@ -8,10 +8,7 @@ export default function Footbar() {
       { name: "Store", href: "/store" },
       { name: "Azienda", href: "/about" },
     ],
-    support: [
-      { name: "Assistenza", href: "#" },
-      { name: "FAQ", href: "#" },
-    ],
+
     company: [{ name: "Azienda", href: "/about" }],
     legal: [
       { name: "Privacy Policy", href: "/privacy-policy" },
@@ -20,7 +17,7 @@ export default function Footbar() {
     social: [
       {
         name: "Facebook",
-        href: "#",
+        href: "https://www.facebook.com/people/Tenute-Farina-Della-Torre/61560469997712/?_rdr",
         icon: (props) => (
           <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
             <path
@@ -33,7 +30,7 @@ export default function Footbar() {
       },
       {
         name: "Instagram",
-        href: "#",
+        href: "https://www.instagram.com/tenute_farina_della_torre/",
         icon: (props) => (
           <svg fill="currentColor" viewBox="0 0 24 24" {...props}>
             <path
@@ -73,23 +70,6 @@ export default function Footbar() {
             </div>
             <div className="mt-10 md:mt-0 mx-auto">
               <h3 className="text-sm font-semibold leading-6 text-gray-900">
-                Supporto
-              </h3>
-              <ul role="list" className="mt-6 space-y-4">
-                {navigation.support.map((item) => (
-                  <li key={item.name}>
-                    <a
-                      href={item.href}
-                      className="text-sm leading-6 text-gray-600 hover:text-gray-900"
-                    >
-                      {item.name}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="mt-10 md:mt-0 mx-auto">
-              <h3 className="text-sm font-semibold leading-6 text-gray-900">
                 Legale
               </h3>
               <ul role="list" className="mt-6 space-y-4">
@@ -113,6 +93,7 @@ export default function Footbar() {
               <a
                 key={item.name}
                 href={item.href}
+                target="__blank"
                 className="text-gray-400 hover:text-gray-500"
               >
                 <span className="sr-only">{item.name}</span>

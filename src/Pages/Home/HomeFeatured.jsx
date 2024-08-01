@@ -48,7 +48,7 @@ export default function HomeFeatured() {
 
   return (
     <>
-      {products && (
+      {products.length > 0 && (
         <div className="bg-white">
           <div className="py-16 sm:py-24 lg:mx-auto lg:max-w-7xl lg:px-8">
             <div className="flex items-center justify-center sm:justify-between px-4 sm:px-6 lg:px-0">

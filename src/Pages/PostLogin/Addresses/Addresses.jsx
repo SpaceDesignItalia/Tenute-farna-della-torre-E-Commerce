@@ -28,7 +28,7 @@ export default function Addresses() {
   const [isUpdateModalOpen, setUpdateModalOpen] = useState(false);
   const [selectedAddressForEdit, setSelectedAddressForEdit] = useState(null);
   const [userData, setUserData] = useState({
-    id: "",
+    idCustomer: "",
     name: "",
     surname: "",
     email: "",
@@ -45,12 +45,12 @@ export default function Addresses() {
           fetchAddresses();
         }
       });
-  }, [userData.id]);
+  }, [userData.idCustomer]);
 
   const fetchAddresses = async () => {
     try {
       const res = await axios.get(API_URL + "/Customer/GetAllShippingInfo", {
-        params: { customerId: userData.id },
+        params: { customerId: userData.idCustomer },
       });
 
       if (res.status === 200 && res.data) {
@@ -78,7 +78,7 @@ export default function Addresses() {
   const isDefaultAddress = async (address) => {
     try {
       const res = await axios.get(API_URL + "/Customer/isDefaultShipping", {
-        params: { idCustomer: userData.id, idShippingInfo: address.id },
+        params: { idCustomer: userData.idCustomer, idShippingInfo: address.id },
       });
 
       if (res.status === 200) {
@@ -100,7 +100,7 @@ export default function Addresses() {
     axios
       .put(API_URL + "/Customer/SetDefaultShipping", {
         idShippingInfo: addressId,
-        idCustomer: userData.id,
+        idCustomer: userData.idCustomer,
       })
       .then((res) => {
         if (res.status === 200) {
@@ -118,7 +118,7 @@ export default function Addresses() {
   const addAddress = (addressId) => {
     axios
       .post(API_URL + "/Customer/AddShippingInfo", {
-        customerId: userData.id,
+        customerId: userData.idCustomer,
         idShippingInfo: addressId,
         name: newAddress.fullName,
         address: newAddress.street,
@@ -169,7 +169,7 @@ export default function Addresses() {
   const deleteAddress = (addressId) => {
     axios
       .delete(API_URL + "/Customer/DeleteShippingInfo", {
-        params: { idCustomer: userData.id, idShippingInfo: addressId },
+        params: { idCustomer: userData.idCustomer, idShippingInfo: addressId },
       })
       .then((res) => {
         if (res.status === 200) {

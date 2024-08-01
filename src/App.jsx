@@ -25,6 +25,7 @@ import ProductDetail from "./Pages/Product/ProductDetail";
 import CookieBanner from "./Components/Layout/CookieBanner";
 import Checkout from "./Pages/Checkout/Checkout";
 import EndOrder from "./Pages/Checkout/EndOrder";
+import Error404 from "./Pages/Errors/Error404";
 
 export default function App() {
   const [isAuth, setIsAuth] = useState(false);
@@ -49,6 +50,23 @@ export default function App() {
       });
   }, []);
 
+  // Definiamo i percorsi protetti
+  const protectedPaths = [
+    "/dashboard",
+    "/orders",
+    "/addresses",
+    "/editAddress",
+    "/addAddress",
+    "/cart",
+    "/checkout",
+    "/order-confirmed",
+  ];
+
+  // Verifichiamo se l'utente sta tentando di accedere a un percorso protetto
+  const isAccessingProtectedPath = protectedPaths.some((path) =>
+    window.location.pathname.startsWith(path)
+  );
+
   if (isLoading) {
     return (
       <div className="absolute left-0 w-full h-full flex flex-col justify-center items-center">
@@ -63,6 +81,10 @@ export default function App() {
       <CookieBanner />
       <Routes>
         <Route element={<Home />} path="/" />
+        {!isAuth ||
+          (!isAccessingProtectedPath && (
+            <Route element={<Error404 />} path="/*" />
+          ))}
         <Route element={<StorePage />} path="/store" />
         <Route element={<PrivacyPolicy />} path="/privacy-policy" />
         <Route element={<TermsAndCondition />} path="/terms-and-conditions" />
@@ -87,25 +109,13 @@ export default function App() {
           path="/recover/passchanged/:email/:token"
         />
       </Routes>
-      <ProtectedRoutes isAuth={isAuth} />
+      <ProtectedRoutes isAuth={isAuth} protectedPaths={protectedPaths} />
       <Footbar />
     </>
   );
 }
 
-const ProtectedRoutes = ({ isAuth }) => {
-  // Definiamo i percorsi protetti
-  const protectedPaths = [
-    "/dashboard",
-    "/orders",
-    "/addresses",
-    "/editAddress",
-    "/addAddress",
-    "/cart",
-    "/checkout",
-    "/order-confirmed",
-  ];
-
+const ProtectedRoutes = ({ isAuth, protectedPaths }) => {
   // Verifichiamo se l'utente sta tentando di accedere a un percorso protetto
   const isAccessingProtectedPath = protectedPaths.some((path) =>
     window.location.pathname.startsWith(path)
@@ -125,7 +135,10 @@ const ProtectedRoutes = ({ isAuth }) => {
         <Route element={<Addresses />} path="/dashboard/addresses" />
         <Route element={<ShoppingCart />} path="/cart" />
         <Route element={<Checkout />} path="/checkout" />
-        <Route element={<EndOrder />} path="/order-confirmed" />
+        <Route
+          element={<EndOrder />}
+          path="/order-confirmed/:customerId/:idPayment"
+        />
       </Route>
     </Routes>
   );

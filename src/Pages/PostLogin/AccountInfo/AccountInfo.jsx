@@ -91,7 +91,7 @@ function GeneralSettings() {
       .then((res) => {
         setData({
           ...data,
-          id: res.data.customer.id,
+          id: res.data.customer.idCustomer,
           name: res.data.customer.name,
           surname: res.data.customer.surname,
           email: res.data.customer.email,
@@ -435,7 +435,7 @@ function GeneralSettings() {
 
 function ManagePassword() {
   const [data, setData] = useState({
-    id: "",
+    idCustomer: "",
     oldPassword: "",
     newPassword: "",
     confirmPassword: "",
@@ -453,7 +453,7 @@ function ManagePassword() {
     axios
       .get(API_URL + "/Customer/GetCustomerData", { withCredentials: true })
       .then((res) => {
-        setData({ ...data, id: res.data.customer.id });
+        setData({ ...data, id: res.data.customer.idCustomer });
       });
   }, []);
 
@@ -652,7 +652,7 @@ function ManageDocument() {
       .then((res) => {
         setData({
           ...data,
-          id: res.data.customer.id,
+          id: res.data.customer.idCustomer,
         });
       })
       .catch((error) => {

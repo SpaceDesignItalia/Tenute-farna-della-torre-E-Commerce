@@ -18,6 +18,7 @@ function classNames(...classes) {
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [isAuth, setIsAuth] = useState(false);
+  const [itemsInCart, setItemsInCart] = useState(false);
 
   useEffect(() => {
     axios
@@ -33,7 +34,14 @@ export default function Navbar() {
         console.error("Errore durante il controllo della sessione:", err);
         setIsAuth(false);
       });
-  }, []);
+    if (isAuth) {
+      axios
+        .get(API_URL + "/Cart/GetCartItemNumber", { withCredentials: true })
+        .then((res) => {
+          setItemsInCart(res.data[0].items);
+        });
+    }
+  }, [isAuth]);
 
   const navigation = {
     pages: [
@@ -222,7 +230,7 @@ export default function Navbar() {
                             aria-hidden="true"
                           />
                           <span className="ml-2 text-sm font-medium text-gray-700 group-hover:text-gray-800">
-                            0
+                            {itemsInCart}
                           </span>
                           <span className="sr-only">
                             items in cart, view bag

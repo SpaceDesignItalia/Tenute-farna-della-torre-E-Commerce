@@ -17,7 +17,7 @@ export default class OurCompany extends Component {
               </div>
               <div class="w-full px-4 mb-10 lg:w-1/2 lg:mb-0 ">
                 <h2 class="pb-4 text-4xl font-bold text-gray-800 ">
-                  L'Evoluzione Vinicola di Tenute Farina
+                  L'evoluzione vinicola di Tenute Farina
                 </h2>
                 <p class="mb-10 text-base leading-7 text-gray-500">
                   Benvenuti nel mondo affascinante e ricco di tradizione delle
