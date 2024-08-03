@@ -75,6 +75,24 @@ export default function ProductPage() {
     }
   };
 
+  const discountedPrice = async (product) => {
+    const currentDate = new Date();
+    const discountStartDate = product.startDate
+      ? new Date(product.startDate)
+      : null;
+    if (discountStartDate && currentDate >= discountStartDate) {
+      if (product.idDiscountType === 1) {
+        const discountedPrice = product.unitPrice - product.value;
+        return discountedPrice > 0 ? discountedPrice : 0;
+      } else if (product.idDiscountType === 2) {
+        const discountedPrice =
+          product.unitPrice - product.unitPrice * (product.value / 100);
+        return discountedPrice > 0 ? discountedPrice : 0;
+      }
+    }
+    return product.unitPrice;
+  };
+
   const handleRedirect = () => {
     window.location.href = `${window.location.href}/details`;
   };
@@ -107,18 +125,24 @@ export default function ProductPage() {
     }, 20);
   }
 
-  function handleAddToCart() {
-    axios
-      .post(
-        API_URL + "/Cart/AddToCart",
-        { idProduct: product.idProduct },
-        { withCredentials: true }
-      )
-      .then((res) => {
-        if (res.status === 200) {
-          alert("Prodotto aggiunto al carrello");
-        }
-      });
+  async function handleAddToCart() {
+    try {
+      const unitPrice = await discountedPrice(product);
+      console.log(unitPrice);
+      axios
+        .post(
+          API_URL + "/Cart/AddToCart",
+          { idProduct: product.idProduct, unitPrice: unitPrice },
+          { withCredentials: true }
+        )
+        .then((res) => {
+          if (res.status === 200) {
+            location.reload();
+          }
+        });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -238,11 +262,18 @@ export default function ProductPage() {
                     onClick={() => {
                       handleAddToCart();
                     }}
-                    isDisabled={!isAuth}
+                    isDisabled={!isAuth || product.productAmount == 0}
                     className="flex max-w-xs flex-1 items-center justify-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-50 sm:w-full"
                   >
-                    <ShoppingCartOutlinedIcon />
-                    Aggiungi al carrello
+                    {product.productAmount == 0 ? (
+                      "Non disponibile"
+                    ) : (
+                      <>
+                        {" "}
+                        <ShoppingCartOutlinedIcon />
+                        Aggiungi al carrello
+                      </>
+                    )}
                   </Button>
                   <Button
                     onClick={handleRedirect}
@@ -259,7 +290,7 @@ export default function ProductPage() {
                   Additional details
                 </h2>
 
-                <div className="divide-y divide-gray-200 border-t">
+                {/* <div className="divide-y divide-gray-200 border-t">
                   <Accordion>
                     <AccordionItem
                       key="1"
@@ -276,7 +307,7 @@ export default function ProductPage() {
                       Test 2
                     </AccordionItem>
                   </Accordion>
-                </div>
+                </div> */}
               </section>
             </div>
           </div>

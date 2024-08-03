@@ -24,20 +24,6 @@ export default function Gallery() {
                 class="group-hover:origin-center group-hover:scale-105 transition inset-0 object-cover object-center  duration-500 w-full h-[350px]"
                 alt="Office content 1"
               />
-              <div class="absolute inset-0 z-0 group-hover:bg-black opacity-60"></div>
-              <div class="absolute hidden p-4 text-center content left-4 bottom-4 right-4 group-hover:block">
-                <a
-                  href="#"
-                  class="mb-2 text-2xl font-semibold text-gray-200 dark:text-white "
-                >
-                  Lorem ipsum
-                </a>
-                <h2 class="mb-0 text-sm font-light text-gray-300 dark:text-gray-300 ">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam
-                </h2>
-              </div>
             </div>
             <div class="relative overflow-hidden shadow-lg group">
               <img
@@ -45,20 +31,6 @@ export default function Gallery() {
                 class="group-hover:origin-center group-hover:scale-105 transition inset-0 object-cover object-center  duration-500 w-full h-[350px]"
                 alt="Office content 5"
               />
-              <div class="absolute inset-0 z-0 group-hover:bg-black opacity-60"></div>
-              <div class="absolute hidden p-4 text-center content left-4 bottom-4 right-4 group-hover:block">
-                <a
-                  href="#"
-                  class="mb-2 text-2xl font-semibold text-gray-200 dark:text-white "
-                >
-                  Lorem ipsum
-                </a>
-                <h2 class="mb-0 text-sm font-light text-gray-300 dark:text-gray-300 ">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam
-                </h2>
-              </div>
             </div>
             <div class="relative overflow-hidden shadow-lg group">
               <img
@@ -66,20 +38,6 @@ export default function Gallery() {
                 class="group-hover:origin-center group-hover:scale-105 transition inset-0 object-cover object-center  duration-500 w-full h-[350px]"
                 alt="Office content 3"
               />
-              <div class="absolute inset-0 z-0 group-hover:bg-black opacity-60"></div>
-              <div class="absolute hidden p-4 text-center content left-4 bottom-4 right-4 group-hover:block">
-                <a
-                  href="#"
-                  class="mb-2 text-2xl font-semibold text-gray-200 dark:text-white "
-                >
-                  Lorem ipsum
-                </a>
-                <h2 class="mb-0 text-sm font-light text-gray-300 dark:text-gray-300 ">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam
-                </h2>
-              </div>
             </div>
             <div class="relative overflow-hidden shadow-lg group">
               <img
@@ -87,20 +45,6 @@ export default function Gallery() {
                 class="group-hover:origin-center group-hover:scale-105 transition inset-0 object-cover object-center  duration-500 w-full h-[350px]"
                 alt="Office content 4"
               />
-              <div class="absolute inset-0 z-0 group-hover:bg-black opacity-60"></div>
-              <div class="absolute hidden p-4 text-center content left-4 bottom-4 right-4 group-hover:block">
-                <a
-                  href="#"
-                  class="mb-2 text-2xl font-semibold text-gray-200 dark:text-white "
-                >
-                  Lorem ipsum
-                </a>
-                <h2 class="mb-0 text-sm font-light text-gray-300 dark:text-gray-300 ">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam
-                </h2>
-              </div>
             </div>
             <div class="relative overflow-hidden shadow-lg group">
               <img
@@ -108,20 +52,6 @@ export default function Gallery() {
                 class="group-hover:origin-center group-hover:scale-105 transition inset-0 object-cover object-center  duration-500 w-full h-[350px]"
                 alt="Office content 5"
               />
-              <div class="absolute inset-0 z-0 group-hover:bg-black opacity-60"></div>
-              <div class="absolute hidden p-4 text-center content left-4 bottom-4 right-4 group-hover:block">
-                <a
-                  href="#"
-                  class="mb-2 text-2xl font-semibold text-gray-200 dark:text-white "
-                >
-                  Lorem ipsum
-                </a>
-                <h2 class="mb-0 text-sm font-light text-gray-300 dark:text-gray-300 ">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam
-                </h2>
-              </div>
             </div>
             <div class="relative overflow-hidden shadow-lg group">
               <img
@@ -129,20 +59,6 @@ export default function Gallery() {
                 class="group-hover:origin-center group-hover:scale-105 transition inset-0 object-cover object-center  duration-500 w-full h-[350px]"
                 alt="Office content 6"
               />
-              <div class="absolute inset-0 z-0 group-hover:bg-black opacity-60"></div>
-              <div class="absolute hidden p-4 text-center content left-4 bottom-4 right-4 group-hover:block">
-                <a
-                  href="#"
-                  class="mb-2 text-2xl font-semibold text-gray-200 dark:text-white "
-                >
-                  Lorem ipsum
-                </a>
-                <h2 class="mb-0 text-sm font-light text-gray-300 dark:text-gray-300 ">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam
-                </h2>
-              </div>
             </div>
             <div class="relative overflow-hidden shadow-lg group">
               <img
@@ -150,20 +66,6 @@ export default function Gallery() {
                 class="group-hover:origin-center group-hover:scale-105 transition inset-0 object-cover object-center  duration-500 w-full h-[350px]"
                 alt="Office content 7"
               />
-              <div class="absolute inset-0 z-0 group-hover:bg-black opacity-60"></div>
-              <div class="absolute hidden p-4 text-center content left-4 bottom-4 right-4 group-hover:block">
-                <a
-                  href="#"
-                  class="mb-2 text-2xl font-semibold text-gray-200 dark:text-white "
-                >
-                  Lorem ipsum
-                </a>
-                <h2 class="mb-0 text-sm font-light text-gray-300 dark:text-gray-300 ">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam
-                </h2>
-              </div>
             </div>
             <div class="relative overflow-hidden shadow-lg group">
               <img
@@ -171,20 +73,6 @@ export default function Gallery() {
                 class="group-hover:origin-center group-hover:scale-105 transition inset-0 object-cover object-center  duration-500 w-full h-[350px]"
                 alt="Office content 8"
               />
-              <div class="absolute inset-0 z-0 group-hover:bg-black opacity-60"></div>
-              <div class="absolute hidden p-4 text-center content left-4 bottom-4 right-4 group-hover:block">
-                <a
-                  href="#"
-                  class="mb-2 text-2xl font-semibold text-gray-200 dark:text-white "
-                >
-                  Lorem ipsum
-                </a>
-                <h2 class="mb-0 text-sm font-light text-gray-300 dark:text-gray-300 ">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                  Ut enim ad minim veniam
-                </h2>
-              </div>
             </div>
           </div>
         </div>
