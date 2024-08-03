@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { loadStripe } from "@stripe/stripe-js";
 import { API_URL } from "../../API/API";
-import { Button, Link, RadioGroup } from "@nextui-org/react";
+import { Button, Checkbox, Link, RadioGroup, Input } from "@nextui-org/react";
 import { CustomRadio } from "../../Components/Layout/CustomRadio";
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
@@ -15,11 +15,16 @@ const fetchPublishableKey = async () => {
 export default function Checkout() {
   const [stripePromise, setStripePromise] = useState(null);
   const [addressList, setAddressList] = useState([]);
-  const [products, setProducts] = React.useState([]);
+  const [products, setProducts] = useState([]);
   const [selectedAddress, setSelectedAddress] = useState(null);
-  const [subtotal, setSubtotal] = React.useState(0);
+  const [subtotal, setSubtotal] = useState(0);
   const shippingCost = 5.0;
-  const [VAT, setVAT] = React.useState(0);
+  const [discount, setDiscount] = useState({
+    haveDiscount: false,
+    discountCode: "",
+    discount: null,
+    isError: false,
+  });
   const [userData, setUserData] = useState({
     idCustomer: "",
     name: "",
@@ -41,6 +46,7 @@ export default function Checkout() {
           fetchAddresses();
         }
       });
+
     axios
       .get(API_URL + "/Cart/GetProductsByIdCustomer", { withCredentials: true })
       .then((response) => {
@@ -56,18 +62,17 @@ export default function Checkout() {
 
   useEffect(() => {
     let subtotal = 0;
-    products.map((product) => {
-      subtotal += product.unitPrice * product.amount;
+    products.forEach((product) => {
+      subtotal += calculateDiscountedPrice(product) * product.amount;
     });
     setSubtotal(subtotal);
-    setVAT(subtotal * 0.22);
   }, [products]);
 
   const handleCheckout = async () => {
     try {
       const response = await axios.post(
         API_URL + "/Payment/CreateCheckoutSession",
-        { products },
+        { products, discount: discount.discount },
         { withCredentials: true }
       );
       const { id } = response.data;
@@ -93,6 +98,7 @@ export default function Checkout() {
         {
           shippingId: selectedAddress,
           idPayment: paymentIntent,
+          idDiscount: discount.discount ? discount.discount.idDiscount : null,
         },
         { withCredentials: true }
       );
@@ -100,6 +106,7 @@ export default function Checkout() {
       return true;
     } catch (error) {
       console.log(error);
+      return false;
     }
   };
 
@@ -152,27 +159,76 @@ export default function Checkout() {
     }
   };
 
-  const setDefaultAddress = (addressId) => {
-    axios
-      .put(API_URL + "/Customer/SetDefaultShipping", {
-        idShippingInfo: addressId,
-        idCustomer: userData.idCustomer,
-      })
-      .then((res) => {
-        if (res.status === 200) {
-          fetchAddresses();
-          console.log("Default address set successfully");
-        } else {
-          console.error("Failed to set default address. Status:", res.status);
-        }
-      })
-      .catch((error) => {
-        console.error("Error setting default address:", error);
-      });
-  };
-
   const handleSelectAddress = (addressId) => {
     setSelectedAddress(addressId);
+  };
+
+  const handleCheckDiscount = async () => {
+    try {
+      const res = await axios.get(
+        API_URL + "/Discounts/CheckDiscountCodeValidity",
+        {
+          params: { discountCode: discount.discountCode },
+          withCredentials: true,
+        }
+      );
+
+      if (res.status === 200 && res.data.length > 0) {
+        setDiscount({ ...discount, discount: res.data[0], isError: false });
+      } else {
+        setDiscount({ ...discount, isError: true });
+      }
+    } catch (error) {
+      console.log("Nessuno sconto valido trovato");
+      setDiscount({ ...discount, isError: true });
+    }
+  };
+
+  const calculateDiscountedPrice = (product) => {
+    const currentDate = new Date();
+    const discountStartDate = product.startDate
+      ? new Date(product.startDate)
+      : null;
+    if (discountStartDate && currentDate >= discountStartDate) {
+      if (product.idDiscountType === 1) {
+        const discountedPrice = product.unitPrice - product.value;
+        return discountedPrice > 0 ? discountedPrice : 0;
+      } else if (product.idDiscountType === 2) {
+        const discountedPrice =
+          product.unitPrice - product.unitPrice * (product.value / 100);
+        return discountedPrice > 0 ? discountedPrice : 0;
+      }
+    }
+    return product.unitPrice;
+  };
+
+  const calculateTotal = (subtotal, shippingCost, discount) => {
+    let discountAmount = 0;
+
+    if (discount && discount.discount) {
+      if (discount.discount.idDiscountType === 1) {
+        discountAmount = discount.discount.value;
+      } else if (discount.discount.idDiscountType === 2) {
+        discountAmount = (subtotal * discount.discount.value) / 100;
+      }
+    }
+
+    const total = subtotal - discountAmount + shippingCost;
+    return total > 0 ? total.toFixed(2) : "0.00";
+  };
+
+  const calculateDiscountAmount = (subtotal, discount) => {
+    let discountAmount = 0;
+
+    if (discount && discount.discount) {
+      if (discount.discount.idDiscountType === 1) {
+        discountAmount = discount.discount.value;
+      } else if (discount.discount.idDiscountType === 2) {
+        discountAmount = (subtotal * discount.discount.value) / 100;
+      }
+    }
+
+    return discountAmount > 0 ? discountAmount.toFixed(2) : "0.00";
   };
 
   return (
@@ -210,21 +266,25 @@ export default function Checkout() {
                             {address.civicNumber}, {address.cap}, {address.city}
                             , {address.province}, {address.nation}
                           </p>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {address.phoneNumber}
+                          </p>
                         </CustomRadio>
                       </div>
                     ))}
                   </div>
                 </RadioGroup>
               ) : (
-                <div className="text-center mt-10">
-                  <h3 className="mt-2 text-normal font-semibold text-gray-900">
-                    Nessun indirizzo presente
-                  </h3>
-
-                  <div className="mt-6">
+                <div className="mt-10">
+                  <p className="text-sm text-gray-500">
+                    Nessun indirizzo disponibile.
+                  </p>
+                  <div className="mt-4">
                     <Button
-                      as={Link}
-                      href="/dashboard/addresses"
+                      color="primary"
+                      onClick={() =>
+                        (window.location.href = "/profile/addresses")
+                      }
                       className="inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                     >
                       <AddRoundedIcon className="-ml-0.5 mr-1.5 h-5 w-5" />
@@ -269,7 +329,7 @@ export default function Checkout() {
 
                       <div className="flex flex-1 items-end justify-between pt-2">
                         <p className="mt-1 text-sm font-medium text-gray-900">
-                          {product.unitPrice} €
+                          {product.cartPrice.toFixed(2)} €
                         </p>
 
                         <div className="ml-4">
@@ -285,7 +345,7 @@ export default function Checkout() {
               </ul>
               <dl className="space-y-6 border-t border-gray-200 px-4 py-6 sm:px-6">
                 <div className="flex items-center justify-between">
-                  <dt className="text-sm">Subtotal</dt>
+                  <dt className="text-sm">Subtotale</dt>
                   <dd className="text-sm font-medium text-gray-900">
                     {subtotal.toFixed(2)} €
                   </dd>
@@ -293,19 +353,71 @@ export default function Checkout() {
                 <div className="flex items-center justify-between">
                   <dt className="text-sm">Spedizione</dt>
                   <dd className="text-sm font-medium text-gray-900">
-                    {shippingCost} €
+                    {shippingCost.toFixed(2)} €
                   </dd>
                 </div>
-                <div className="flex items-center justify-between">
-                  <dt className="text-sm">IVA</dt>
-                  <dd className="text-sm font-medium text-gray-900">
-                    {VAT.toFixed(2)} €
-                  </dd>
+
+                <div className="flex flex-col items-center justify-between border-t border-gray-200 pt-6">
+                  <div className="flex flex-row justify-between w-full">
+                    <dt className="text-base font-medium">Sconti</dt>
+                    <dd className="text-base font-medium text-gray-900">
+                      <Checkbox
+                        color="primary"
+                        onValueChange={() =>
+                          setDiscount({
+                            ...discount,
+                            haveDiscount: !discount.haveDiscount,
+                          })
+                        }
+                      >
+                        Ho uno sconto
+                      </Checkbox>
+                    </dd>
+                  </div>
+
+                  {discount.haveDiscount && (
+                    <div className="flex flex-row justify-between gap-2 w-full mt-3">
+                      <Input
+                        isInvalid={discount.isError}
+                        errorMessage="Codice sconto non valido o già utilizzato"
+                        variant="bordered"
+                        radius="sm"
+                        placeholder="Inserisci un codice sconto"
+                        onChange={(e) =>
+                          setDiscount({
+                            ...discount,
+                            discountCode: e.target.value,
+                          })
+                        }
+                      />
+                      <Button
+                        color="primary"
+                        radius="sm"
+                        className="text-white w-1/3"
+                        isDisabled={discount.discountCode === ""}
+                        onClick={handleCheckDiscount}
+                      >
+                        Valida
+                      </Button>
+                    </div>
+                  )}
                 </div>
+
+                {discount.haveDiscount && discount.discount && (
+                  <div className="flex items-center justify-between border-t border-gray-200 pt-6">
+                    <dt className="text-base font-medium">
+                      Ammontare dello sconto
+                    </dt>
+                    <dd className="text-base font-medium text-gray-900">
+                      -{calculateDiscountAmount(subtotal, discount)} €
+                    </dd>
+                  </div>
+                )}
+
                 <div className="flex items-center justify-between border-t border-gray-200 pt-6">
-                  <dt className="text-base font-medium">Total</dt>
+                  <dt className="text-base font-medium">Totale</dt>
                   <dd className="text-base font-medium text-gray-900">
-                    {(subtotal + VAT + shippingCost).toFixed(2)} €
+                    {calculateTotal(subtotal, shippingCost, discount)} €
                   </dd>
                 </div>
               </dl>
@@ -313,7 +425,11 @@ export default function Checkout() {
               <div className="border-t border-gray-200 px-4 py-6 sm:px-6">
                 <Button
                   onClick={handleCheckout}
-                  isDisabled={selectedAddress === null || products.length === 0}
+                  isDisabled={
+                    selectedAddress === null ||
+                    products.length === 0 ||
+                    (discount.haveDiscount && discount.discount === null)
+                  }
                   className="w-full rounded-md border border-transparent bg-primary px-4 py-3 text-base font-medium text-white shadow-sm hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-50"
                 >
                   Pagamento

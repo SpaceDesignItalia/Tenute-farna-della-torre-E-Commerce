@@ -75,6 +75,24 @@ export default function ProductPage() {
     }
   };
 
+  const discountedPrice = async (product) => {
+    const currentDate = new Date();
+    const discountStartDate = product.startDate
+      ? new Date(product.startDate)
+      : null;
+    if (discountStartDate && currentDate >= discountStartDate) {
+      if (product.idDiscountType === 1) {
+        const discountedPrice = product.unitPrice - product.value;
+        return discountedPrice > 0 ? discountedPrice : 0;
+      } else if (product.idDiscountType === 2) {
+        const discountedPrice =
+          product.unitPrice - product.unitPrice * (product.value / 100);
+        return discountedPrice > 0 ? discountedPrice : 0;
+      }
+    }
+    return product.unitPrice;
+  };
+
   const handleRedirect = () => {
     window.location.href = `${window.location.href}/details`;
   };
@@ -107,18 +125,24 @@ export default function ProductPage() {
     }, 20);
   }
 
-  function handleAddToCart() {
-    axios
-      .post(
-        API_URL + "/Cart/AddToCart",
-        { idProduct: product.idProduct },
-        { withCredentials: true }
-      )
-      .then((res) => {
-        if (res.status === 200) {
-          location.reload();
-        }
-      });
+  async function handleAddToCart() {
+    try {
+      const unitPrice = await discountedPrice(product);
+      console.log(unitPrice);
+      axios
+        .post(
+          API_URL + "/Cart/AddToCart",
+          { idProduct: product.idProduct, unitPrice: unitPrice },
+          { withCredentials: true }
+        )
+        .then((res) => {
+          if (res.status === 200) {
+            location.reload();
+          }
+        });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (

@@ -20,13 +20,13 @@ export default function ShoppingCart() {
   const [update, setUpdate] = useState(false);
   const [subtotal, setSubtotal] = useState(0);
   const shippingCost = 5.0;
-  const [VAT, setVAT] = useState(0);
   const [disabledOptions, setDisabledOptions] = useState({});
 
   useEffect(() => {
     axios
       .get(API_URL + "/Cart/GetProductsByIdCustomer", { withCredentials: true })
       .then((response) => {
+        console.log(response.data);
         setProducts(response.data);
         const newDisabledOptions = {};
 
@@ -46,10 +46,10 @@ export default function ShoppingCart() {
   useEffect(() => {
     let subtotal = 0;
     products.map((product) => {
-      subtotal += product.unitPrice * product.amount;
+      subtotal += product.cartPrice * product.amount;
     });
+
     setSubtotal(subtotal);
-    setVAT(subtotal * 0.22);
   }, [products]);
 
   const handleUpdateAmount = (idProduct, amount) => {
@@ -147,11 +147,11 @@ export default function ShoppingCart() {
                             </a>
                           </h3>
                         </div>
-                        <p>{product.unitPrice} €</p>
+                        <p>{product.cartPrice} €</p>
                         <h4 className="mt-1 text-sm font-medium text-gray-900">
                           Totale prodotto:{" "}
                         </h4>
-                        <p>{product.unitPrice * product.amount} €</p>
+                        <p>{product.cartPrice * product.amount} €</p>
                       </div>
 
                       <div className="flex items-center gap-3 mt-4 sm:mt-0 sm:pr-9">
@@ -253,15 +253,10 @@ export default function ShoppingCart() {
                   {shippingCost} €
                 </dd>
               </div>
-              <div className="flex items-center justify-between border-t border-gray-200 pt-4">
-                <dt className="text-sm text-gray-600">IVA (22%)</dt>
-                <dd className="text-sm font-medium text-gray-900">
-                  {VAT.toFixed(2)} €
-                </dd>
-              </div>
+
               <div className="flex items-center justify-between border-t border-gray-200 pt-4 text-base font-medium text-gray-900">
                 <dt>Totale</dt>
-                <dd>{(subtotal + shippingCost + VAT).toFixed(2)} €</dd>
+                <dd>{(subtotal + shippingCost).toFixed(2)} €</dd>
               </div>
               <Button
                 as={Link}

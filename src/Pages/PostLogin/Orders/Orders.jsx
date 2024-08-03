@@ -64,6 +64,9 @@ export default function Orders() {
           API_URL + "/order/GetOrdersByIdCustomer",
           { withCredentials: true }
         );
+
+        console.log(response.data);
+
         const groupedOrders = groupOrdersById(response.data);
 
         const ordersWithPaymentDetails = await Promise.all(
@@ -92,8 +95,6 @@ export default function Orders() {
     fetchOrders();
   }, []);
 
-  console.log(orders);
-
   function groupOrdersById(data) {
     const ordersMap = new Map();
     data.forEach((item) => {
@@ -107,7 +108,11 @@ export default function Orders() {
         productName,
         productDescription,
         productImagePath,
-        unitPrice,
+        price,
+        idDiscount,
+        discountCode,
+        idDiscountType,
+        value,
       } = item;
 
       if (!ordersMap.has(idOrder)) {
@@ -115,6 +120,10 @@ export default function Orders() {
           idOrder,
           idCustomer,
           idPayment,
+          idDiscount,
+          discountCode,
+          idDiscountType,
+          value,
           createdDatetime,
           products: [],
         });
@@ -127,18 +136,34 @@ export default function Orders() {
         description: productDescription,
         imageSrc: API_URL + "/uploads/" + productImagePath,
         imageAlt: productName,
-        price: unitPrice,
+        price: price,
       });
     });
     return Array.from(ordersMap.values());
   }
 
-  function calculateOrderTotal(order) {
-    return order.products.reduce(
+  const calculateOrderTotal = (order) => {
+    // Calcola il subtotale
+    const subtotal = order.products.reduce(
       (total, product) => total + product.price * product.amount,
       0
     );
-  }
+
+    // Calcola l'importo dello sconto
+    let discountAmount = 0;
+    if (order.idDiscount != null) {
+      if (order.idDiscountType === 1) {
+        discountAmount = order.value; // Sconto fisso
+      } else if (order.idDiscountType === 2) {
+        discountAmount = (subtotal * order.value) / 100; // Sconto percentuale
+      }
+    }
+
+    // Calcola il totale finale
+    const total = subtotal - discountAmount;
+
+    return total > 0 ? total.toFixed(2) : "0.00";
+  };
 
   if (loading) {
     return (
@@ -257,9 +282,9 @@ export default function Orders() {
                         </time>
                       </h3>
 
-                      <div className="flex items-center border-b border-gray-200 p-4 sm:grid sm:grid-cols-4 sm:gap-x-6 sm:p-6">
-                        <dl className="grid flex-1 grid-cols-2 gap-x-6 text-sm sm:col-span-3 sm:grid-cols-3 lg:col-span-2">
-                          <div>
+                      <div className="flex items-center border-b border-gray-200 p-4 sm:gap-x-6 sm:p-6 w-full">
+                        <dl className="grid flex-1 grid-cols-2 gap-x-6 text-sm sm:col-span-3 md:grid-cols-8 w-1/2">
+                          <div className="col-span-2">
                             <dt className="font-medium text-gray-900">
                               Numero ordine
                             </dt>
@@ -267,7 +292,7 @@ export default function Orders() {
                               #{order.idOrder}
                             </dd>
                           </div>
-                          <div className="hidden sm:block">
+                          <div className="col-span-2">
                             <dt className="font-medium text-gray-900">
                               Ordinato il
                             </dt>
@@ -279,6 +304,16 @@ export default function Orders() {
                               </time>
                             </dd>
                           </div>
+                          {order.discountCode !== null && (
+                            <div className="col-span-2">
+                              <dt className="font-medium text-gray-900">
+                                Codice sconto
+                              </dt>
+                              <dd className="mt-1 text-gray-500">
+                                {order.discountCode}
+                              </dd>
+                            </div>
+                          )}
                           <div>
                             <dt className="font-medium text-gray-900">
                               Totale
