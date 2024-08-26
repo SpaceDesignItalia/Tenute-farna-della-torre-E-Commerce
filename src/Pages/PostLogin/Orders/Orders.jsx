@@ -61,11 +61,9 @@ export default function Orders() {
     const fetchOrders = async () => {
       try {
         const response = await axios.get(
-          API_URL + "/order/GetOrdersByIdCustomer",
+          API_URL + "/Order/GetOrdersByIdCustomer",
           { withCredentials: true }
         );
-
-        console.log(response.data);
 
         const groupedOrders = groupOrdersById(response.data);
 
