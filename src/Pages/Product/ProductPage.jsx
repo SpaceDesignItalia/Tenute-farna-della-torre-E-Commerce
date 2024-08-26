@@ -15,6 +15,7 @@ function classNames(...classes) {
 
 export default function ProductPage() {
   const [isAuth, setIsAuth] = useState(false);
+  const [userData, setUserData] = useState({});
   const [product, setProduct] = useState({});
   const [images, setImages] = useState([]);
   const [selectedOption, setSelectedOption] = useState(null); // Modifica per supportare più prodotti
@@ -30,6 +31,12 @@ export default function ProductPage() {
         } else {
           setIsAuth(false);
         }
+      });
+    axios
+      .get(API_URL + "/Customer/GetCustomerData", { withCredentials: true })
+      .then((res) => {
+        setUserData(res.data.customer);
+        console.log(res.data);
       });
     axios
       .get(
@@ -155,7 +162,7 @@ export default function ProductPage() {
             <Tab.Group as="div" className="flex flex-col-reverse">
               {/* Image selector */}
               <div className="mx-auto mt-6 w-full max-w-2xl sm:block lg:max-w-none">
-                <Tab.List className="grid grid-cols-4 gap-6">
+                <Tab.List className="grid grid-cols-4 gap-6 px-3">
                   {images.map((image, index) => (
                     <Tab
                       key={index}
@@ -185,7 +192,7 @@ export default function ProductPage() {
                 </Tab.List>
               </div>
 
-              <Tab.Panels className="flex md:block aspect-h-1 aspect-w-1 w-full">
+              <Tab.Panels className="flex md:block aspect-h-1 w-full px-2">
                 {images.map((image) => (
                   <Tab.Panel>
                     <Image
@@ -262,8 +269,12 @@ export default function ProductPage() {
                     onClick={() => {
                       handleAddToCart();
                     }}
-                    isDisabled={!isAuth || product.productAmount == 0}
-                    className="flex max-w-xs flex-1 items-center justify-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-50 sm:w-full"
+                    isDisabled={
+                      !isAuth ||
+                      product.productAmount == 0 ||
+                      userData.idStatus !== 3
+                    }
+                    className="flex flex-1 items-center justify-center rounded-md border border-transparent bg-primary px-8 py-3 text-base font-medium text-white hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-50 sm:w-full"
                   >
                     {product.productAmount == 0 ? (
                       "Non disponibile"
@@ -277,7 +288,7 @@ export default function ProductPage() {
                   </Button>
                   <Button
                     onClick={handleRedirect}
-                    className="flex max-w-xs flex-1 items-center justify-center rounded-md border-2 bg-white border-primary text-primary px-8 py-3 text-base font-medium hover:text-white hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-50 sm:w-full"
+                    className="flex flex-1 items-center justify-center rounded-md border-2 bg-white border-primary text-primary px-8 py-3 text-base font-medium hover:text-white hover:bg-primary focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-gray-50 sm:w-full"
                   >
                     <ReceiptLongOutlinedIcon />
                     Valori nutrizionali

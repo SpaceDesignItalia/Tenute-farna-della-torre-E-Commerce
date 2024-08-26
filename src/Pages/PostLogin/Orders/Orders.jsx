@@ -113,6 +113,7 @@ export default function Orders() {
         discountCode,
         idDiscountType,
         value,
+        shippingLink,
       } = item;
 
       if (!ordersMap.has(idOrder)) {
@@ -125,6 +126,7 @@ export default function Orders() {
           idDiscountType,
           value,
           createdDatetime,
+          shippingLink,
           products: [],
         });
       }
@@ -229,6 +231,8 @@ export default function Orders() {
       </section>
     );
   }
+
+  console.log(orders);
 
   return (
     <section className="py-10 px-10 max-w-7xl mx-auto rounded-lg">
@@ -386,6 +390,27 @@ export default function Orders() {
                                     </>
                                   )}
                                 </Menu.Item>
+
+                                <Menu.Item>
+                                  {({ active }) => (
+                                    <>
+                                      {order.shippingLink && (
+                                        <a
+                                          href={order.shippingLink}
+                                          target="blank"
+                                          className={classNames(
+                                            active
+                                              ? "bg-gray-100 text-gray-900"
+                                              : "text-gray-700",
+                                            "block px-4 py-2 text-sm"
+                                          )}
+                                        >
+                                          Traccia ordine
+                                        </a>
+                                      )}
+                                    </>
+                                  )}
+                                </Menu.Item>
                               </div>
                             </Menu.Items>
                           </Transition>
@@ -398,6 +423,18 @@ export default function Orders() {
                               className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-2.5 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                             >
                               <span>Vedi ricevuta</span>
+                              <span className="sr-only">
+                                for order {order.idOrder}
+                              </span>
+                            </a>
+                          )}
+                          {order.shippingLink != null && (
+                            <a
+                              href={order.shippingLink}
+                              target="blank"
+                              className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-2.5 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+                            >
+                              <span>Traccia ordine</span>
                               <span className="sr-only">
                                 for order {order.idOrder}
                               </span>

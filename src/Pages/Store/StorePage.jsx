@@ -106,7 +106,7 @@ export default function StorePage() {
       if (product.idDiscountType === 1) {
         return (
           <Chip color="primary" radius="sm">
-            <p className="text-white">- €{product.value}</p>
+            <p className="text-white">-{product.value}€</p>
           </Chip>
         );
       } else {
