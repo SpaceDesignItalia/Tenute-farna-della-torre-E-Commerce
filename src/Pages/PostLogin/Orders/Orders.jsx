@@ -9,6 +9,7 @@ import "dayjs/locale/it";
 import localizedFormat from "dayjs/plugin/localizedFormat";
 import { useLocation } from "react-router-dom";
 import { Button, Skeleton } from "@nextui-org/react";
+import { Shield } from "@mui/icons-material";
 
 dayjs.extend(localizedFormat);
 dayjs.locale("it");
@@ -65,6 +66,7 @@ export default function Orders() {
           { withCredentials: true }
         );
 
+        console.log(response.data);
         const groupedOrders = groupOrdersById(response.data);
 
         const ordersWithPaymentDetails = await Promise.all(
@@ -111,6 +113,7 @@ export default function Orders() {
         discountCode,
         idDiscountType,
         value,
+        shippingCost,
         shippingLink,
       } = item;
 
@@ -123,6 +126,7 @@ export default function Orders() {
           discountCode,
           idDiscountType,
           value,
+          shippingCost,
           createdDatetime,
           shippingLink,
           products: [],
@@ -144,10 +148,11 @@ export default function Orders() {
 
   const calculateOrderTotal = (order) => {
     // Calcola il subtotale
-    const subtotal = order.products.reduce(
-      (total, product) => total + product.price * product.amount,
-      0
-    );
+    const subtotal =
+      order.products.reduce(
+        (total, product) => total + product.price * product.amount,
+        0
+      ) + 5;
 
     // Calcola l'importo dello sconto
     let discountAmount = 0;

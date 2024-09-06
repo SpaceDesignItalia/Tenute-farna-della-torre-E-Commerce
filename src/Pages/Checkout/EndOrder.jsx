@@ -15,7 +15,7 @@ export default function EndOrder() {
     const fetchPaymentDetails = async () => {
       try {
         const response = await axios.get(
-          API_URL + "/Payment/GetCheckoutDetails",
+          API_URL + "/Payments/GetCheckoutDetails",
           { params: { idPayment } }
         );
         setPaymentDetails(response.data);
@@ -28,7 +28,7 @@ export default function EndOrder() {
     const getOrderData = async () => {
       try {
         axios
-          .get(API_URL + "/order/GetOrderDataByIdCustomerAndPaymentId", {
+          .get(API_URL + "/Order/GetOrderDataByIdCustomerAndPaymentId", {
             params: { IdPayment: idPayment },
             withCredentials: true,
           })
@@ -44,7 +44,7 @@ export default function EndOrder() {
     const getOrderProducts = async () => {
       try {
         axios
-          .get(API_URL + "/order/GetOrderByIdCustomerAndPaymentId", {
+          .get(API_URL + "/Order/GetOrderByIdCustomerAndPaymentId", {
             params: { IdPayment: idPayment },
             withCredentials: true,
           })

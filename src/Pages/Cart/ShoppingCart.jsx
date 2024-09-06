@@ -26,7 +26,6 @@ export default function ShoppingCart() {
     axios
       .get(API_URL + "/Cart/GetProductsByIdCustomer", { withCredentials: true })
       .then((response) => {
-        console.log(response.data);
         setProducts(response.data);
         const newDisabledOptions = {};
 
@@ -247,16 +246,27 @@ export default function ShoppingCart() {
                   {subtotal} €
                 </dd>
               </div>
-              <div className="flex items-center justify-between border-t border-gray-200 pt-4">
-                <dt className="text-sm text-gray-600">Spese di spedizione</dt>
-                <dd className="text-sm font-medium text-gray-900">
-                  {shippingCost} €
-                </dd>
-              </div>
+              {products.length === 0 ? (
+                <div className="flex items-center justify-between border-t border-gray-200 pt-4">
+                  <dt className="text-sm text-gray-600">Spese di spedizione</dt>
+                  <dd className="text-sm font-medium text-gray-900">0 €</dd>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between border-t border-gray-200 pt-4">
+                  <dt className="text-sm text-gray-600">Spese di spedizione</dt>
+                  <dd className="text-sm font-medium text-gray-900">
+                    {shippingCost} €
+                  </dd>
+                </div>
+              )}
 
               <div className="flex items-center justify-between border-t border-gray-200 pt-4 text-base font-medium text-gray-900">
                 <dt>Totale</dt>
-                <dd>{(subtotal + shippingCost).toFixed(2)} €</dd>
+                {products.length === 0 ? (
+                  <dd>0 €</dd>
+                ) : (
+                  <dd>{(subtotal + shippingCost).toFixed(2)} €</dd>
+                )}
               </div>
               <Button
                 as={Link}

@@ -72,7 +72,7 @@ export default function Checkout() {
     try {
       const response = await axios.post(
         API_URL + "/Payment/CreateCheckoutSession",
-        { products, discount: discount.discount },
+        { products, discount: discount.discount, shippingCost: shippingCost },
         { withCredentials: true }
       );
       const { id } = response.data;
@@ -283,7 +283,7 @@ export default function Checkout() {
                     <Button
                       color="primary"
                       onClick={() =>
-                        (window.location.href = "/profile/addresses")
+                        (window.location.href = "/dashboard/addresses")
                       }
                       className="inline-flex items-center rounded-md bg-primary px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-primary focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
                     >
