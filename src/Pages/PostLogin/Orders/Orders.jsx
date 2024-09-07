@@ -66,7 +66,6 @@ export default function Orders() {
           { withCredentials: true }
         );
 
-        console.log(response.data);
         const groupedOrders = groupOrdersById(response.data);
 
         const ordersWithPaymentDetails = await Promise.all(
@@ -234,8 +233,6 @@ export default function Orders() {
       </section>
     );
   }
-
-  console.log(orders);
 
   return (
     <section className="py-10 px-10 max-w-7xl mx-auto rounded-lg">
@@ -433,8 +430,12 @@ export default function Orders() {
                           )}
                           {order.shippingLink != null && (
                             <a
-                              href={order.shippingLink}
-                              target="blank"
+                              href={
+                                order.shippingLink.startsWith("http")
+                                  ? order.shippingLink
+                                  : `https://${order.shippingLink}`
+                              }
+                              target="_blank"
                               className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-2.5 py-2 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
                             >
                               <span>Traccia ordine</span>
@@ -443,6 +444,7 @@ export default function Orders() {
                               </span>
                             </a>
                           )}
+
                           {!order.paymentDetails?.paid && (
                             <Button
                               color="primary"

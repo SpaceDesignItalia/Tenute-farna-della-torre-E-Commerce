@@ -36,7 +36,6 @@ export default function ProductPage() {
       .get(API_URL + "/Customer/GetCustomerData", { withCredentials: true })
       .then((res) => {
         setUserData(res.data.customer);
-        console.log(res.data);
       });
     axios
       .get(
@@ -135,7 +134,6 @@ export default function ProductPage() {
   async function handleAddToCart() {
     try {
       const unitPrice = await discountedPrice(product);
-      console.log(unitPrice);
       axios
         .post(
           API_URL + "/Cart/AddToCart",

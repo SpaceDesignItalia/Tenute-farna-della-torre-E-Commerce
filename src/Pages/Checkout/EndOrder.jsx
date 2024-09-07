@@ -29,7 +29,7 @@ export default function EndOrder() {
       try {
         axios
           .get(API_URL + "/Order/GetOrderDataByIdCustomerAndPaymentId", {
-            params: { IdPayment: idPayment },
+            params: { idCustomer: customerId, IdPayment: idPayment },
             withCredentials: true,
           })
           .then((response) => {
